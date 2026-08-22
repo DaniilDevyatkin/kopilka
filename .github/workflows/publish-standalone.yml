@@ -34,6 +34,11 @@ jobs:
       - name: Install and generate Prisma Client
         run: |
           npm ci --no-audit --no-fund
+          # npm/cli#4828 can omit platform packages from a lockfile created on
+          # Windows. Install the Linux Tailwind compiler only on the CI runner;
+          # it is build-time-only and is not shipped to the VDS.
+          npm install --no-save --no-package-lock --no-audit --no-fund \
+            @tailwindcss/oxide-linux-x64-gnu@4.3.3
           npm run db:generate
 
       - name: Build compact Next.js standalone server
