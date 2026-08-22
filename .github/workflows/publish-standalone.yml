@@ -95,6 +95,14 @@ jobs:
             echo "Expected standalone /app/home to redirect to /login; got HTTP $status"
             cat "$headers"
             cat "$RUNNER_TEMP/kopilka-standalone.log"
+            message=$(
+              {
+                echo "HTTP $status"
+                grep -Ei '^location:' "$headers" || true
+                tail -n 30 "$RUNNER_TEMP/kopilka-standalone.log"
+              } | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g'
+            )
+            printf '::error title=Standalone PWA entry route failed::%s\n' "$message"
             exit 1
           fi
 

@@ -19,7 +19,7 @@ export default function manifest(): ExtendedManifest {
     short_name: "Копилка",
     description:
       "Спокойный инструмент для счетов, операций, накоплений и финансовых целей.",
-    start_url: "/app/home",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     display_override: ["standalone", "minimal-ui"],

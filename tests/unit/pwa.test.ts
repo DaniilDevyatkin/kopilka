@@ -15,7 +15,7 @@ describe("PWA foundation", () => {
       id: "/app",
       name: "Копилка — личные финансы",
       short_name: "Копилка",
-      start_url: "/app/home",
+      start_url: "/",
       scope: "/",
       display: "standalone",
       display_override: ["standalone", "minimal-ui"],
