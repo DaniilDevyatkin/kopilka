@@ -32,7 +32,7 @@ npm audit --omit=dev
 
 ## Production
 
-Для малого Linux VDS GitHub Actions заранее собирает компактный Next.js standalone. На VDS нет `npm ci` и `next build`: native Node/systemd запускает приложение, существующий nginx с Certbot обслуживает HTTPS (Caddy остаётся fallback), а в Docker остаётся только PostgreSQL.
+Для малого Linux VDS GitHub Actions заранее собирает компактный Next.js standalone. На VDS нет `npm ci` и `next build`: native Node/systemd запускает приложение, существующий nginx с Certbot обслуживает HTTPS, а в Docker остаётся только PostgreSQL. Caddy используется только как fallback на чистом VDS и удаляется после успешного перехода на nginx.
 
 ```bash
 bash scripts/deploy-vds.sh kopim.devyatkinprod.ru admin@example.com

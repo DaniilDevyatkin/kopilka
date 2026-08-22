@@ -174,6 +174,33 @@ configure_nginx_proxy() {
   systemctl reload nginx.service
 }
 
+remove_native_caddy() {
+  local path
+
+  systemctl disable --now caddy.service >/dev/null 2>&1 || true
+  rm -f -- /usr/local/bin/caddy /etc/systemd/system/caddy.service
+
+  for path in /etc/caddy /var/lib/caddy /run/caddy; do
+    case "$path" in
+      /etc/caddy|/var/lib/caddy|/run/caddy) rm -rf -- "$path" ;;
+      *) fail "Отказ удаления неожиданного Caddy path: $path" ;;
+    esac
+  done
+
+  find /tmp -mindepth 1 -maxdepth 1 -type d -name 'caddy-install.*' \
+    -exec rm -rf -- {} + 2>/dev/null || true
+
+  if id caddy >/dev/null 2>&1; then
+    userdel caddy >/dev/null 2>&1 || true
+  fi
+  if getent group caddy >/dev/null 2>&1; then
+    groupdel caddy >/dev/null 2>&1 || true
+  fi
+
+  systemctl reset-failed caddy.service >/dev/null 2>&1 || true
+  systemctl daemon-reload
+}
+
 github_headers=()
 load_github_token() {
   local token_file="/root/.config/kopilka/github-token"
@@ -477,8 +504,7 @@ docker image rm caddy:2-alpine >/dev/null 2>&1 || true
 docker image prune --force >/dev/null 2>&1 || true
 
 if nginx_is_available; then
-  rm -f -- /usr/local/bin/caddy /etc/systemd/system/caddy.service
-  systemctl daemon-reload
+  remove_native_caddy
 fi
 
 for generated_dir in "$ROOT_DIR/node_modules" "$ROOT_DIR/.next"; do

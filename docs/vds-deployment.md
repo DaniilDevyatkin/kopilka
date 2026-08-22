@@ -4,7 +4,7 @@ Production-контур рассчитан на текущий VDS с диско
 
 - GitHub Actions собирает `.next/standalone`, добавляет один Node.js binary и публикует проверяемые SHA-256 артефакты;
 - приложение работает как непривилегированный systemd-сервис `kopilka`;
-- существующий nginx обслуживает HTTPS через Certbot; native Caddy используется только как fallback на чистом VDS;
+- существующий nginx обслуживает HTTPS через Certbot; native Caddy используется только как fallback на чистом VDS и полностью удаляется после успешного перехода на nginx;
 - в Docker остаётся только `postgres:18-alpine` с существующим volume `kopilka_postgres_data`;
 - Prisma migrator скачивается только на время deploy и сразу удаляется;
 - хранятся максимум две версии приложения и два локальных pre-deploy backup;
