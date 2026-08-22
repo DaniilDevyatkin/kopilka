@@ -64,7 +64,7 @@ create_environment() {
 }
 
 install_runtime_packages() {
-  local -a packages=(ca-certificates curl jq openssl tar)
+  local -a packages=(ca-certificates curl openssl tar)
   local -a missing=()
   local package
   local deadline
@@ -187,15 +187,12 @@ ensure_release_access() {
 download_asset() {
   local asset_name="$1"
   local output_path="$2"
-  local asset_url
-  asset_url="$(jq -r --arg name "$asset_name" '.assets[] | select(.name == $name) | .url' <<<"$release_json" | head -n 1)"
-  [[ -n "$asset_url" && "$asset_url" != "null" ]] || fail "В release нет файла $asset_name. Дождитесь зелёного workflow Publish standalone production release."
+  local asset_url="https://github.com/$REPOSITORY/releases/download/$RELEASE_TAG/$asset_name"
 
   curl --fail --silent --show-error --location \
-    -H 'Accept: application/octet-stream' \
-    -H 'X-GitHub-Api-Version: 2022-11-28' \
     "${github_headers[@]}" \
-    "$asset_url" > "$output_path"
+    "$asset_url" > "$output_path" \
+    || fail "Не удалось скачать $asset_name. Дождитесь зелёного workflow Publish standalone production release."
 }
 
 remove_old_compose_service() {
