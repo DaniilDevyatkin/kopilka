@@ -1,0 +1,14 @@
+.next/
+coverage/
+node_modules/
+playwright-report/
+test-results/
+src/generated/
+
+# Prisma has its own formatter; SQL migrations are intentionally hand-reviewed.
+prisma/schema.prisma
+prisma/migrations/
+
+# Product requirements and architecture records are maintained manually.
+CODEX_KOPILKA_MASTER_PROMPT.md
+docs/

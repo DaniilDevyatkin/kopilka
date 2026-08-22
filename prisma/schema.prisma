@@ -1,0 +1,415 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Currency {
+  RUB
+  EUR
+  USD
+  KZT
+  GEL
+}
+
+enum Theme {
+  SYSTEM
+  LIGHT
+  DARK
+}
+
+enum OnboardingStep {
+  ACCOUNT
+  BUDGET
+  GOAL
+  COMPLETED
+}
+
+enum AccountType {
+  DEBIT_CARD
+  CREDIT_CARD
+  CASH
+  SAVINGS
+  BANK_ACCOUNT
+  CUSTOM
+}
+
+enum CategoryKind {
+  INCOME
+  EXPENSE
+}
+
+enum OperationType {
+  INCOME
+  EXPENSE
+  TRANSFER
+  OPENING_BALANCE
+  BALANCE_ADJUSTMENT
+  GOAL_PURCHASE
+  REVERSAL
+}
+
+enum LedgerEntryRole {
+  PRIMARY
+  TRANSFER_SOURCE
+  TRANSFER_DESTINATION
+  REVERSAL
+}
+
+enum GoalCategory {
+  TECH
+  TRAVEL
+  CAR
+  HOUSING
+  EDUCATION
+  GIFT
+  CLOTHES
+  HEALTH
+  HOBBY
+  EMERGENCY_FUND
+  OTHER
+}
+
+enum GoalPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  CANCELLED
+}
+
+enum GoalReservationType {
+  INITIAL_RESERVE
+  CONTRIBUTION
+  WITHDRAWAL
+  RELEASE_ON_COMPLETION
+  RELEASE_ON_ARCHIVE
+  REVERSAL
+}
+
+enum IdempotencyState {
+  PROCESSING
+  COMPLETED
+  FAILED_RETRYABLE
+}
+
+enum AuthAttemptAction {
+  REGISTRATION
+  LOGIN
+  PASSWORD_CHANGE
+}
+
+model User {
+  id                  String                  @id @default(uuid()) @db.Uuid
+  loginNormalized     String                  @unique @db.VarChar(191)
+  loginDisplay        String                  @db.VarChar(191)
+  passwordHash        String
+  displayName         String?                 @db.VarChar(120)
+  baseCurrency        Currency                @default(RUB)
+  disabledAt          DateTime?               @db.Timestamptz(3)
+  createdAt           DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                @updatedAt @db.Timestamptz(3)
+  sessions            Session[]
+  settings            UserSettings?
+  onboardingState     OnboardingState?
+  authAttempts        AuthAttempt[]
+  accounts            Account[]
+  categories          Category[]
+  financialOperations FinancialOperation[]
+  ledgerEntries       LedgerEntry[]
+  goals               Goal[]
+  goalReservations    GoalReservationEntry[]
+  idempotencyKeys     IdempotencyKey[]
+  notification        NotificationPreference?
+  pushSubscriptions   PushSubscription[]
+  imageAssets         ImageAsset[]
+
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique @db.Char(64)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  lastSeenAt DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt  DateTime  @db.Timestamptz(3)
+  revokedAt  DateTime? @db.Timestamptz(3)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model AuthAttempt {
+  id           String            @id @default(uuid()) @db.Uuid
+  userId       String?           @db.Uuid
+  subjectHash  String            @db.Char(64)
+  networkHash  String?           @db.Char(64)
+  action       AuthAttemptAction
+  succeeded    Boolean           @default(false)
+  occurredAt   DateTime          @default(now()) @db.Timestamptz(3)
+  blockedUntil DateTime?         @db.Timestamptz(3)
+  user         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([subjectHash, action, occurredAt])
+  @@index([networkHash, action, occurredAt])
+  @@index([userId])
+  @@index([blockedUntil])
+  @@map("auth_attempts")
+}
+
+model UserSettings {
+  userId                        String   @id @db.Uuid
+  monthlyIncomeMinor            BigInt   @default(0)
+  mandatoryMonthlyExpensesMinor BigInt   @default(0)
+  timeZone                      String   @default("Europe/Moscow") @db.VarChar(100)
+  theme                         Theme    @default(SYSTEM)
+  privacyModeDefault            Boolean  @default(false)
+  createdAt                     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt                     DateTime @updatedAt @db.Timestamptz(3)
+  user                          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model OnboardingState {
+  userId                  String         @id @db.Uuid
+  currentStep             OnboardingStep @default(ACCOUNT)
+  firstAccountCompletedAt DateTime?      @db.Timestamptz(3)
+  budgetCompletedAt       DateTime?      @db.Timestamptz(3)
+  goalStepCompletedAt     DateTime?      @db.Timestamptz(3)
+  goalStepSkippedAt       DateTime?      @db.Timestamptz(3)
+  completedAt             DateTime?      @db.Timestamptz(3)
+  updatedAt               DateTime       @updatedAt @db.Timestamptz(3)
+  user                    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_states")
+}
+
+model Account {
+  id               String                 @id @default(uuid()) @db.Uuid
+  userId           String                 @db.Uuid
+  name             String                 @db.VarChar(120)
+  type             AccountType
+  currency         Currency
+  visualTheme      String                 @default("default") @db.VarChar(64)
+  imageAssetId     String?                @db.Uuid
+  last4            String?                @db.Char(4)
+  creditLimitMinor BigInt?
+  archivedAt       DateTime?              @db.Timestamptz(3)
+  createdAt        DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime               @updatedAt @db.Timestamptz(3)
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  imageAsset       ImageAsset?             @relation(fields: [imageAssetId, userId], references: [id, userId], onDelete: Restrict)
+  ledgerEntries    LedgerEntry[]
+  goalReservations GoalReservationEntry[]
+
+  @@unique([id, userId])
+  @@unique([imageAssetId, userId])
+  @@index([userId, archivedAt])
+  @@index([userId, type])
+  @@map("accounts")
+}
+
+model Category {
+  id          String               @id @default(uuid()) @db.Uuid
+  ownerUserId String?              @db.Uuid
+  kind        CategoryKind
+  slug        String               @db.VarChar(80)
+  labelRu     String               @db.VarChar(80)
+  iconName    String               @db.VarChar(80)
+  sortOrder   Int                  @default(0)
+  archivedAt  DateTime?            @db.Timestamptz(3)
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(3)
+  owner       User?                @relation(fields: [ownerUserId], references: [id], onDelete: Restrict)
+  operations  FinancialOperation[]
+
+  @@unique([ownerUserId, kind, slug])
+  @@index([ownerUserId, kind, archivedAt])
+  @@index([kind, sortOrder])
+  @@map("categories")
+}
+
+model FinancialOperation {
+  id                    String               @id @default(uuid()) @db.Uuid
+  userId                String               @db.Uuid
+  type                  OperationType
+  categoryId            String?              @db.Uuid
+  goalId                String?              @db.Uuid
+  note                  String?              @db.VarChar(500)
+  occurredAt            DateTime             @db.Timestamptz(3)
+  reversesOperationId   String?              @db.Uuid
+  supersedesOperationId String?              @db.Uuid
+  createdAt             DateTime             @default(now()) @db.Timestamptz(3)
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  category              Category?            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  goal                  Goal?                @relation(fields: [goalId, userId], references: [id, userId], onDelete: Restrict)
+  ledgerEntries         LedgerEntry[]
+  reversesOperation     FinancialOperation?  @relation("OperationReversal", fields: [reversesOperationId, userId], references: [id, userId], onDelete: Restrict)
+  reversedBy            FinancialOperation?  @relation("OperationReversal")
+  supersedesOperation   FinancialOperation?  @relation("OperationSupersession", fields: [supersedesOperationId, userId], references: [id, userId], onDelete: Restrict)
+  supersededBy          FinancialOperation[] @relation("OperationSupersession")
+
+  @@unique([id, userId])
+  @@unique([reversesOperationId, userId])
+  @@index([userId, occurredAt])
+  @@index([userId, type, occurredAt])
+  @@index([userId, categoryId, occurredAt])
+  @@index([userId, goalId, occurredAt])
+  @@index([categoryId])
+  @@index([supersedesOperationId])
+  @@map("financial_operations")
+}
+
+model LedgerEntry {
+  id          String             @id @default(uuid()) @db.Uuid
+  userId      String             @db.Uuid
+  operationId String             @db.Uuid
+  accountId   String             @db.Uuid
+  amountMinor BigInt
+  role        LedgerEntryRole    @default(PRIMARY)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  operation   FinancialOperation @relation(fields: [operationId, userId], references: [id, userId], onDelete: Restrict)
+  account     Account            @relation(fields: [accountId, userId], references: [id, userId], onDelete: Restrict)
+
+  @@unique([operationId, accountId])
+  @@index([userId, accountId, createdAt])
+  @@index([userId, operationId])
+  @@map("ledger_entries")
+}
+
+model Goal {
+  id                        String                 @id @default(uuid()) @db.Uuid
+  userId                    String                 @db.Uuid
+  name                      String                 @db.VarChar(160)
+  category                  GoalCategory
+  description               String?                @db.VarChar(1000)
+  targetAmountMinor         BigInt
+  targetDate                DateTime?              @db.Date
+  priority                  GoalPriority           @default(MEDIUM)
+  status                    GoalStatus             @default(ACTIVE)
+  imageAssetId              String?                @db.Uuid
+  completedAt               DateTime?              @db.Timestamptz(3)
+  actualPurchaseAmountMinor BigInt?
+  archivedAt                DateTime?              @db.Timestamptz(3)
+  createdAt                 DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime               @updatedAt @db.Timestamptz(3)
+  user                      User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  imageAsset                ImageAsset?            @relation(fields: [imageAssetId, userId], references: [id, userId], onDelete: Restrict)
+  reservationEntries        GoalReservationEntry[]
+  purchaseOperations        FinancialOperation[]
+
+  @@unique([id, userId])
+  @@unique([imageAssetId, userId])
+  @@index([userId, status, priority])
+  @@index([userId, targetDate])
+  @@index([userId, category])
+  @@map("goals")
+}
+
+model GoalReservationEntry {
+  id              String                @id @default(uuid()) @db.Uuid
+  userId          String                @db.Uuid
+  goalId          String                @db.Uuid
+  sourceAccountId String                @db.Uuid
+  type            GoalReservationType
+  amountMinor     BigInt
+  note            String?               @db.VarChar(500)
+  occurredAt      DateTime              @db.Timestamptz(3)
+  reversesEntryId String?               @db.Uuid
+  createdAt       DateTime              @default(now()) @db.Timestamptz(3)
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  goal            Goal                  @relation(fields: [goalId, userId], references: [id, userId], onDelete: Restrict)
+  sourceAccount   Account               @relation(fields: [sourceAccountId, userId], references: [id, userId], onDelete: Restrict)
+  reversesEntry   GoalReservationEntry? @relation("ReservationReversal", fields: [reversesEntryId, userId], references: [id, userId], onDelete: Restrict)
+  reversedBy      GoalReservationEntry? @relation("ReservationReversal")
+
+  @@unique([id, userId])
+  @@unique([reversesEntryId, userId])
+  @@index([userId, goalId, occurredAt])
+  @@index([userId, sourceAccountId, occurredAt])
+  @@map("goal_reservation_entries")
+}
+
+model IdempotencyKey {
+  id           String           @id @default(uuid()) @db.Uuid
+  userId       String           @db.Uuid
+  scope        String           @db.VarChar(80)
+  key          String           @db.VarChar(191)
+  requestHash  String           @db.Char(64)
+  state        IdempotencyState @default(PROCESSING)
+  resourceType String?          @db.VarChar(80)
+  resourceId   String?          @db.Uuid
+  resultJson   Json?
+  createdAt    DateTime         @default(now()) @db.Timestamptz(3)
+  completedAt  DateTime?        @db.Timestamptz(3)
+  expiresAt    DateTime?        @db.Timestamptz(3)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, scope, key])
+  @@index([userId, state, createdAt])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+model ImageAsset {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @db.Uuid
+  storageKey    String    @unique @db.VarChar(500)
+  mimeType      String    @db.VarChar(64)
+  byteSize      BigInt
+  width         Int
+  height        Int
+  integrityHash String?   @db.Char(64)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  deletedAt     DateTime? @db.Timestamptz(3)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  goal          Goal?
+  account       Account?
+
+  @@unique([id, userId])
+  @@index([userId, deletedAt])
+  @@map("image_assets")
+}
+
+model NotificationPreference {
+  userId                String   @id @db.Uuid
+  weeklyReminderEnabled Boolean  @default(false)
+  reminderDay           Int?
+  reminderMinute        Int?
+  nearGoalEnabled       Boolean  @default(false)
+  goalCompletedEnabled  Boolean  @default(false)
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @db.Timestamptz(3)
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model PushSubscription {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  endpoint  String    @unique
+  p256dh    String
+  auth      String
+  expiresAt DateTime? @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@map("push_subscriptions")
+}

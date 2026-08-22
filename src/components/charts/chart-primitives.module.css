@@ -1,0 +1,265 @@
+.figure {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+}
+
+.figure figcaption {
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-caption);
+}
+
+.legend {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-caption);
+}
+
+.swatch {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+}
+
+.legendLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+}
+
+.legendValue {
+  margin-inline-start: auto;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.progressGroup,
+.week {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-body-sm);
+}
+
+.copy span {
+  color: var(--text-secondary);
+}
+
+.copy strong {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.track {
+  height: 0.625rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+
+.fill,
+.weekFill {
+  display: block;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.fill {
+  width: var(--progress-value);
+  height: 100%;
+}
+
+.fillOverfunded {
+  background: var(--warning);
+}
+
+.overfunded {
+  margin: 0;
+  color: var(--warning);
+  font-size: var(--text-body-sm);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--surface-sunken);
+}
+
+.ringFill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+}
+
+.ringFill[data-overfunded] {
+  stroke: var(--warning);
+}
+
+.ringPercent {
+  fill: var(--text-primary);
+  font-size: 20px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.weekDay {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.weekTrack {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 0.75rem;
+  height: 3rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+
+.weekFill {
+  width: 100%;
+  height: var(--week-value);
+}
+
+.weekFillOver {
+  background: var(--warning);
+}
+
+.weekLabel {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.weekSummary {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.chartSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+}
+
+.gridLine {
+  stroke: var(--chart-grid);
+}
+
+.line {
+  stroke: var(--accent);
+}
+
+.area {
+  fill: var(--accent);
+  opacity: 0.12;
+}
+
+.xLabels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.donut {
+  display: block;
+  width: min(100%, 11rem);
+  margin-inline: auto;
+}
+
+.donutTotal {
+  fill: var(--text-primary);
+  font-size: 7.5px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.donutCaption {
+  fill: var(--text-muted);
+  font-size: 4.5px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fill {
+    transform-origin: left center;
+    transition: width var(--duration-reveal) var(--ease-spring);
+    animation: chart-bar-enter var(--duration-cinematic) var(--ease-spring) both;
+  }
+
+  .ringFill {
+    transition: stroke-dashoffset var(--duration-reveal) var(--ease-spring);
+  }
+
+  .weekFill {
+    transform-origin: bottom center;
+    transition: height var(--duration-reveal) var(--ease-spring);
+    animation: chart-week-enter var(--duration-cinematic) var(--ease-spring)
+      both;
+  }
+
+  .donut,
+  .chartSvg {
+    animation: chart-visual-enter var(--duration-cinematic) var(--ease-spring)
+      both;
+  }
+}
+
+@keyframes chart-bar-enter {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes chart-week-enter {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes chart-visual-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem) scale(0.985);
+  }
+}

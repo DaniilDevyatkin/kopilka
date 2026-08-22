@@ -1,0 +1,863 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.pageHeader {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-overline);
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.pageDescription {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-body);
+}
+
+.headerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.primaryActionLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--space-5);
+  color: var(--accent-contrast);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryActionLink:hover {
+  background: var(--accent-hover);
+}
+
+.primaryActionLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-heading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.sectionCount {
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-4);
+}
+
+.accountCard {
+  --theme-glow: var(--accent);
+  position: relative;
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-4);
+  overflow: hidden;
+  padding: 1.25rem;
+  border-radius: var(--account-card-radius);
+  box-shadow: var(--account-card-shadow);
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.accountCard[data-theme="sunset"] {
+  --theme-glow: #f59e0b;
+}
+
+.accountCard[data-theme="forest"] {
+  --theme-glow: #10b981;
+}
+
+.accountCard[data-theme="ocean"] {
+  --theme-glow: #38bdf8;
+}
+
+.accountCard[data-theme="graphite"] {
+  --theme-glow: oklch(0.6 0.02 260);
+}
+
+.accountCard[data-kind="debit"] {
+  color: var(--account-card-debit-text);
+  background: var(--account-card-debit-bg);
+}
+
+.accountCard[data-kind="savings"] {
+  color: var(--account-card-savings-text);
+  background: var(--account-card-savings-bg);
+}
+
+.accountCard[data-kind="credit"] {
+  color: var(--account-card-credit-text);
+  background: var(--account-card-credit-bg);
+}
+
+.accountCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    color-mix(in oklch, var(--theme-glow) 22%, transparent),
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+.cardImage {
+  z-index: -3;
+  object-fit: cover;
+}
+.cardImageShade {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    rgb(3 24 20 / 82%),
+    rgb(3 24 20 / 40%) 68%,
+    rgb(3 24 20 / 26%)
+  );
+}
+
+.accountCard::before {
+  position: absolute;
+  z-index: -1;
+  width: 13rem;
+  height: 13rem;
+  right: -5rem;
+  bottom: -8rem;
+  content: "";
+  border: 1.75rem solid color-mix(in oklch, currentColor 12%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.accountCard:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.accountCard:hover .accountName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cardArtwork {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 7rem;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.cardTop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.accountMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.accountName {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-heading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardBottom {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.balanceLabel {
+  font-size: var(--text-overline);
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.accountBalance {
+  display: block;
+  max-inline-size: 100%;
+  margin: 0;
+  overflow-x: clip;
+  font-size: clamp(1.35rem, 4vw, 1.9rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.last4Chip {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, currentColor 14%, transparent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.archivedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, currentColor 14%, transparent);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+}
+
+.archivedCard {
+  filter: saturate(0.6);
+}
+
+.archivedCard .accountBalance {
+  opacity: 0.75;
+}
+
+.emptyState {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding-block: var(--space-8);
+  text-align: center;
+}
+
+.emptyArtwork {
+  width: min(11rem, 60vw);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.formColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-4);
+}
+
+.cancelLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--space-5);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cancelLink:hover {
+  background: var(--surface-hover);
+}
+
+.cancelLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cancelLink[aria-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.formError {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--negative);
+  border-radius: var(--radius-md);
+  background: var(--negative-subtle);
+  font-size: var(--text-body-sm);
+}
+
+.themeGroup {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.themeGroup legend {
+  margin-bottom: var(--space-2);
+  font-weight: 700;
+}
+
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--space-3);
+}
+
+.themeOption {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  justify-items: stretch;
+  gap: var(--space-1);
+  cursor: pointer;
+}
+
+.themeOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.themeSwatch {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.58 / 1;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: 0.95rem;
+  transition: border-color 0.15s ease;
+}
+
+.themeSwatch img {
+  object-fit: cover;
+}
+
+.themeOption input:checked + .themeSwatch {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.themeOption input:focus-visible + .themeSwatch {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.uploadPlaceholder {
+  display: grid;
+  height: 100%;
+  place-content: center;
+  justify-items: center;
+  gap: 0.25rem;
+  color: var(--accent);
+  border: 1px dashed var(--border-strong);
+  background: var(--surface-sunken);
+  font-size: 1.6rem;
+}
+.uploadPlaceholder small {
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.themeLabel {
+  overflow: hidden;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.detailHeader {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: fit-content;
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--text-primary);
+}
+
+.backLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.balanceCard {
+  --theme-glow: var(--accent);
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+  overflow: hidden;
+  padding: var(--space-card);
+  border-radius: var(--account-card-radius);
+  box-shadow: var(--account-card-shadow);
+  isolation: isolate;
+}
+
+.balanceCard[data-kind="debit"] {
+  color: var(--account-card-debit-text);
+  background: var(--account-card-debit-bg);
+}
+
+.balanceCard[data-kind="savings"] {
+  color: var(--account-card-savings-text);
+  background: var(--account-card-savings-bg);
+}
+
+.balanceCard[data-kind="credit"] {
+  color: var(--account-card-credit-text);
+  background: var(--account-card-credit-bg);
+}
+
+.balanceCard[data-theme="sunset"] {
+  --theme-glow: #f59e0b;
+}
+
+.balanceCard[data-theme="forest"] {
+  --theme-glow: #10b981;
+}
+
+.balanceCard[data-theme="ocean"] {
+  --theme-glow: #38bdf8;
+}
+
+.balanceCard[data-theme="graphite"] {
+  --theme-glow: oklch(0.6 0.02 260);
+}
+
+.balanceCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    color-mix(in oklch, var(--theme-glow) 22%, transparent),
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+.balanceCard > :not(.cardImage, .cardImageShade) {
+  position: relative;
+  z-index: 1;
+}
+
+.balanceHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.balanceTitle {
+  margin: 0;
+  font-size: var(--text-heading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.bigBalance {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.balanceMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.reserveNote {
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.balanceActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-4);
+}
+
+.statCard {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-card);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+
+.statLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 650;
+}
+
+.statValue {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.statInflow {
+  color: var(--positive);
+}
+
+.statOutflow {
+  color: var(--negative);
+}
+
+.chartCard,
+.transactionsCard {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-card);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+
+.chartTitle {
+  margin: 0;
+  font-size: var(--text-heading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.chartHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+}
+
+.transactionList {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.transactionItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.transactionIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  color: var(--text-muted);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+}
+
+.transactionCopy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.transactionTitle {
+  margin: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transactionSub {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transactionAmount {
+  margin: 0;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+
+.amountInflow {
+  color: var(--positive);
+}
+
+.amountOutflow {
+  color: var(--negative);
+}
+
+.offlineBanner {
+  width: 100%;
+}
+
+.reconcileHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+}
+
+.reconcileSummary {
+  margin: 0;
+  font-weight: 650;
+}
+
+@media (max-width: 35rem) {
+  .page {
+    gap: 1.5rem;
+  }
+
+  .headerRow {
+    flex-wrap: nowrap;
+  }
+
+  .primaryActionLink {
+    min-height: 2.625rem;
+    padding-inline: var(--space-4);
+    font-size: 0.8rem;
+  }
+
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .accountCard {
+    min-height: 12.5rem;
+    border-radius: 1.6rem;
+  }
+
+  .balanceActions .actionButton {
+    flex: 1 1 100%;
+  }
+
+  .formActions .actionButton {
+    flex: 1 1 100%;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .accountCard:hover,
+  .balanceCard:hover {
+    transform: translateY(-0.25rem) rotate(0.25deg) scale(1.012);
+    box-shadow: var(--elevation-3);
+  }
+
+  .accountCard:hover .cardImage,
+  .balanceCard:hover .cardImage {
+    transform: scale(1.045);
+    filter: saturate(1.08) contrast(1.025);
+  }
+
+  .accountCard:hover::before,
+  .balanceCard:hover::after {
+    transform: translate3d(-0.4rem, -0.2rem, 0) scale(1.06);
+  }
+
+  .primaryActionLink:hover,
+  .actionButton:hover,
+  .cancelLink:hover,
+  .backLink:hover {
+    transform: translateY(-0.12rem);
+  }
+
+  .themeOption:hover .themeSwatch {
+    transform: translateY(-0.18rem) scale(1.012);
+    box-shadow: var(--elevation-2);
+  }
+
+  .transactionItem:hover {
+    background: var(--surface-hover);
+    transform: translateX(0.18rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .accountCard,
+  .balanceCard,
+  .cardImage,
+  .accountCard::before,
+  .accountCard::after,
+  .balanceCard::after,
+  .primaryActionLink,
+  .actionButton,
+  .cancelLink,
+  .backLink,
+  .themeSwatch,
+  .transactionItem,
+  .statCard,
+  .chartCard,
+  .transactionsCard {
+    transition:
+      color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard),
+      filter var(--duration-standard) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard),
+      transform var(--duration-deliberate) var(--ease-spring),
+      scale var(--duration-fast) var(--ease-spring);
+  }
+
+  .accountGrid > .accountCard {
+    animation: accounts-card-enter var(--duration-reveal) var(--ease-spring)
+      both;
+  }
+
+  .accountGrid > .accountCard:nth-child(2) {
+    animation-delay: 65ms;
+  }
+
+  .accountGrid > .accountCard:nth-child(3) {
+    animation-delay: 115ms;
+  }
+
+  .accountGrid > .accountCard:nth-child(n + 4) {
+    animation-delay: 165ms;
+  }
+
+  .themeOption input:checked + .themeSwatch {
+    animation: accounts-theme-select var(--duration-deliberate)
+      var(--ease-soft-spring) both;
+  }
+
+  .bigBalance,
+  .accountBalance {
+    animation: accounts-amount-enter var(--duration-reveal) var(--ease-spring)
+      100ms both;
+  }
+}
+
+@keyframes accounts-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.85rem) scale(0.975);
+  }
+}
+
+@keyframes accounts-theme-select {
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes accounts-amount-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+}
+
+@media (forced-colors: active) {
+  .accountCard::before,
+  .accountCard::after,
+  .balanceCard::after {
+    display: none;
+  }
+}

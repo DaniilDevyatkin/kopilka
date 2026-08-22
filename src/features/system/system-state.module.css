@@ -1,0 +1,23 @@
+.container,
+.fullPage {
+  display: grid;
+  width: min(100%, 48rem);
+  min-height: 20rem;
+  margin-inline: auto;
+  place-items: center;
+  padding: var(--space-5);
+}
+.fullPage {
+  min-height: 100dvh;
+}
+.linkButton {
+  display: inline-grid;
+  min-height: 2.75rem;
+  place-items: center;
+  padding-inline: var(--space-5);
+  color: var(--accent-contrast);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-weight: 750;
+  text-decoration: none;
+}

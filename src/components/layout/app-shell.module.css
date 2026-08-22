@@ -1,0 +1,610 @@
+.appShell {
+  width: min(100%, 30rem);
+  min-height: 100dvh;
+  margin-inline: auto;
+  background:
+    radial-gradient(
+      circle at 82% 4%,
+      color-mix(in oklch, var(--accent-subtle) 60%, transparent) 0,
+      transparent 25rem
+    ),
+    var(--bg);
+}
+
+.skipLink {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  color: var(--accent-contrast);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  transform: translateY(-160%);
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
+.authBrand img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.navigationLink {
+  display: flex;
+  min-width: 0;
+  min-height: 2.875rem;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navigationLink[aria-current="page"] {
+  position: relative;
+  color: var(--text-primary);
+  background: var(--accent-subtle);
+}
+
+.navigationLink svg {
+  flex: 0 0 auto;
+}
+
+.generatedNavIcon {
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: saturate(0.72);
+}
+
+.navigationLink[aria-current="page"] .generatedNavIcon {
+  filter: saturate(1.08)
+    drop-shadow(
+      0 0.2rem 0.45rem color-mix(in oklch, var(--accent) 28%, transparent)
+    );
+}
+
+.mobileHeader {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  min-height: calc(4.25rem + env(safe-area-inset-top));
+  align-items: center;
+  gap: var(--space-3);
+  padding: max(var(--space-3), env(safe-area-inset-top)) var(--space-4)
+    var(--space-3);
+  justify-content: space-between;
+  background: color-mix(in oklch, var(--bg) 84%, transparent);
+  backdrop-filter: blur(24px) saturate(1.25);
+}
+
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  text-decoration: none;
+}
+
+.mobileHeader img {
+  width: 2.25rem;
+  height: 2.25rem;
+  object-fit: contain;
+}
+
+.mainContent {
+  width: min(100%, var(--content-max));
+  min-width: 0;
+  min-height: calc(100dvh - 4rem);
+  padding: var(--space-3) var(--space-page)
+    calc(7.5rem + env(safe-area-inset-bottom));
+  outline: none;
+}
+
+.mobileNavigation {
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  width: min(
+    calc(
+      100% - var(--space-6) - env(safe-area-inset-left) -
+        env(safe-area-inset-right)
+    ),
+    28.5rem
+  );
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 4.5rem;
+  align-items: end;
+  padding: var(--space-2);
+  border: 1px solid color-mix(in oklch, var(--border-strong) 70%, transparent);
+  border-radius: 1.6rem;
+  background: color-mix(in oklch, var(--surface-elevated) 89%, transparent);
+  box-shadow: 0 1.25rem 3.5rem oklch(0.05 0.02 175 / 0.38);
+  backdrop-filter: blur(28px) saturate(1.35);
+  transform: translateX(-50%);
+  will-change: transform;
+}
+
+.mobileNavigation .navigationLink,
+.addAction {
+  display: grid;
+  min-width: 0;
+  min-height: 3.5rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: var(--space-1);
+  color: var(--text-muted);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: 0.6875rem;
+  font-weight: 750;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobileNavigation .navigationLink[aria-current="page"] {
+  color: var(--accent);
+  background: transparent;
+}
+
+.mobileNavigation .navigationLink[aria-current="page"]::after {
+  position: absolute;
+  right: 28%;
+  bottom: 0.15rem;
+  left: 28%;
+  height: 0.18rem;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  content: "";
+}
+
+.addAction {
+  color: var(--text-secondary);
+}
+
+.addActionIcon {
+  display: grid;
+  width: 2.875rem;
+  height: 2.875rem;
+  margin-top: -1.25rem;
+  place-items: center;
+  color: var(--accent-contrast);
+  border: 3px solid var(--surface-elevated);
+  border-radius: 1rem;
+  background: color-mix(
+    in oklch,
+    var(--accent-subtle) 65%,
+    var(--surface-elevated)
+  );
+  box-shadow: var(--elevation-2);
+}
+
+.sheetLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 4.25rem;
+  padding: var(--space-4);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--accent-subtle);
+  text-decoration: none;
+}
+
+.sheetLink > span,
+.futureActions li > span {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.sheetLink small,
+.futureActions small {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+}
+
+.quickActions {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  margin: var(--space-4) 0 0;
+  list-style: none;
+}
+
+.sheetAction {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 3.75rem;
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.sheetAction > span {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.sheetAction small {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+}
+
+.dialogActionLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--space-5);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.routeState {
+  width: min(100%, 44rem);
+  min-width: 0;
+  padding: clamp(var(--space-6), 6vw, var(--space-12));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: color-mix(in oklch, var(--surface) 94%, transparent);
+  box-shadow: var(--elevation-2);
+}
+
+.routeIcon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--space-6);
+  place-items: center;
+  color: var(--accent);
+  border-radius: var(--radius-lg);
+  background: var(--accent-subtle);
+}
+
+.routeEyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--accent);
+  font-size: var(--text-overline);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.routeState h1 {
+  font-size: var(--text-title);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.routeDescription {
+  margin: var(--space-4) 0 0;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.routeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+}
+
+.routeLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  font-size: var(--text-body-sm);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.authShell {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: var(--space-8);
+  padding: max(var(--space-6), env(safe-area-inset-top)) var(--space-page)
+    max(var(--space-6), env(safe-area-inset-bottom));
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      var(--accent-subtle),
+      transparent 28rem
+    ),
+    var(--bg);
+}
+
+.authBrand {
+  display: block;
+  width: clamp(4.75rem, 10vw, 6rem);
+  padding: var(--space-1);
+  border-radius: var(--radius-xl);
+}
+
+.authContent {
+  display: grid;
+  width: min(100%, 40rem);
+  align-content: center;
+}
+
+@media (hover: hover) {
+  .navigationLink:hover,
+  .routeLink:hover,
+  .sheetLink:hover,
+  .sheetAction:hover,
+  .dialogActionLink:hover {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+  }
+
+  .addAction:hover .addActionIcon {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+  }
+}
+
+@media (min-width: 48rem) {
+  .appShell {
+    border-inline: 1px solid var(--border);
+    box-shadow: 0 0 5rem oklch(0.08 0.02 185 / 0.14);
+  }
+
+  .mainContent {
+    width: 100%;
+  }
+}
+
+@media (display-mode: standalone) {
+  .mobileHeader {
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
+  }
+}
+
+@media (max-width: 22rem) {
+  .mobileNavigation {
+    padding-inline: max(var(--space-1), env(safe-area-inset-left));
+  }
+
+  .mobileNavigation .navigationLink,
+  .addAction {
+    font-size: 0.625rem;
+  }
+
+  .routeState {
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .navigationLink,
+  .routeLink,
+  .sheetLink,
+  .sheetAction,
+  .dialogActionLink,
+  .addActionIcon,
+  .skipLink {
+    transition:
+      color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard),
+      filter var(--duration-standard) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard),
+      transform var(--duration-deliberate) var(--ease-spring),
+      scale var(--duration-fast) var(--ease-spring);
+  }
+
+  .appShell {
+    animation: shell-color-settle var(--duration-cinematic) var(--ease-standard)
+      both;
+  }
+
+  .mobileHeader {
+    animation: shell-header-enter var(--duration-reveal) var(--ease-spring) both;
+  }
+
+  .mobileBrand img {
+    animation: shell-brand-enter var(--duration-cinematic)
+      var(--ease-soft-spring) 70ms both;
+  }
+
+  .mainContent > * {
+    animation: shell-route-enter var(--duration-reveal) var(--ease-spring) both;
+  }
+
+  .mainContent > * > :where(header, section, nav, form, div, article) {
+    animation: shell-item-enter var(--duration-reveal) var(--ease-spring) both;
+  }
+
+  .mainContent
+    > *
+    > :where(header, section, nav, form, div, article):nth-child(2) {
+    animation-delay: 55ms;
+  }
+
+  .mainContent
+    > *
+    > :where(header, section, nav, form, div, article):nth-child(3) {
+    animation-delay: 105ms;
+  }
+
+  .mainContent
+    > *
+    > :where(header, section, nav, form, div, article):nth-child(4) {
+    animation-delay: 155ms;
+  }
+
+  .mainContent
+    > *
+    > :where(header, section, nav, form, div, article):nth-child(n + 5) {
+    animation-delay: 205ms;
+  }
+
+  .mobileNavigation {
+    animation: shell-nav-enter var(--duration-cinematic) var(--ease-spring)
+      120ms both;
+  }
+
+  .mobileNavigation .navigationLink[aria-current="page"]::after {
+    animation: shell-active-marker var(--duration-deliberate)
+      var(--ease-soft-spring) both;
+  }
+
+  .navigationLink[aria-current="page"] .generatedNavIcon {
+    animation: shell-active-icon var(--duration-deliberate)
+      var(--ease-soft-spring) both;
+  }
+
+  .addActionIcon {
+    animation: shell-add-enter var(--duration-cinematic) var(--ease-soft-spring)
+      220ms both;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .navigationLink:hover .generatedNavIcon {
+    filter: saturate(1.08)
+      drop-shadow(
+        0 0.25rem 0.5rem color-mix(in oklch, var(--accent) 20%, transparent)
+      );
+    transform: translateY(-0.12rem) scale(1.04);
+  }
+
+  .mobileBrand:hover img {
+    transform: rotate(-4deg) scale(1.06);
+  }
+
+  .sheetLink:hover,
+  .sheetAction:hover {
+    transform: translateY(-0.12rem);
+    box-shadow: var(--elevation-1);
+  }
+}
+
+@keyframes shell-color-settle {
+  from {
+    opacity: 0.88;
+  }
+}
+
+@keyframes shell-header-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.65rem);
+  }
+}
+
+@keyframes shell-brand-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.72) rotate(-10deg);
+  }
+}
+
+@keyframes shell-route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.65rem);
+  }
+}
+
+@keyframes shell-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.85rem) scale(0.985);
+  }
+}
+
+@keyframes shell-nav-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1.4rem) scale(0.94);
+  }
+}
+
+@keyframes shell-active-marker {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes shell-active-icon {
+  0% {
+    transform: translateY(0.2rem) scale(0.86);
+  }
+
+  65% {
+    transform: translateY(-0.08rem) scale(1.06);
+  }
+}
+
+@keyframes shell-add-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.72) rotate(-12deg);
+  }
+}
+
+@media (forced-colors: active) {
+  .mobileHeader,
+  .mobileNavigation,
+  .routeState,
+  .routeLink,
+  .sheetLink {
+    border-color: CanvasText;
+  }
+
+  .navigationLink[aria-current="page"] {
+    outline: 2px solid Highlight;
+  }
+}

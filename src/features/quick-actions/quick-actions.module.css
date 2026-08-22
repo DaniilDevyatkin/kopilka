@@ -1,0 +1,25 @@
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.formError {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--negative);
+  border-radius: var(--radius-md);
+  background: var(--negative-subtle);
+  font-size: var(--text-body-sm);
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.amountPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

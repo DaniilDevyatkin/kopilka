@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Знак «Копилки»</title>
+  <desc id="desc">Абстрактная буква К из контейнера и растущих уровней накопления</desc>
+  <rect width="1024" height="1024" fill="#002a1f"/>
+  <path fill="#f2f0e7" d="M302 230c0-31 25-56 56-56s56 25 56 56v564c0 31-25 56-56 56s-56-25-56-56V230Z"/>
+  <path fill="none" stroke="#7cceb2" stroke-linecap="round" stroke-width="112" d="m447 459 88-82m60-56 35-33m105-97 28-26"/>
+  <path fill="#f2f0e7" d="M409 521a56 56 0 0 1 79 4l262 286a56 56 0 1 1-83 76L405 600a56 56 0 0 1 4-79Z"/>
+  <circle cx="412" cy="518" r="35" fill="#e7be6d"/>
+</svg>

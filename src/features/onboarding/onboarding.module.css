@@ -1,0 +1,326 @@
+.wizard {
+  display: grid;
+  width: min(100%, 38rem);
+  gap: var(--space-6);
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progressItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border);
+}
+
+.progressCurrent {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.progressDone {
+  color: var(--positive);
+  border-bottom-color: var(--positive);
+}
+
+.progressDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.panel {
+  display: grid;
+  width: min(100%, 38rem);
+  padding: clamp(var(--space-6), 5vw, var(--space-10));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: color-mix(in oklch, var(--surface) 96%, transparent);
+  box-shadow: var(--elevation-2);
+}
+
+.artwork {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: var(--space-4);
+}
+
+.accountArtwork {
+  width: clamp(7.5rem, 24vw, 10rem);
+  height: auto;
+  margin: calc(var(--space-3) * -1) auto var(--space-4);
+  object-fit: contain;
+  filter: drop-shadow(0 1rem 1.5rem oklch(0.12 0.04 165 / 0.22));
+}
+
+.budgetArtwork {
+  width: clamp(9rem, 30vw, 12rem);
+  height: auto;
+  margin: calc(var(--space-3) * -1) auto var(--space-4);
+  object-fit: contain;
+  filter: drop-shadow(0 1rem 1.75rem oklch(0.12 0.04 155 / 0.24));
+}
+
+.goalArtwork {
+  width: clamp(8rem, 26vw, 11rem);
+  height: auto;
+  margin: calc(var(--space-3) * -1) auto var(--space-4);
+  object-fit: contain;
+  filter: drop-shadow(0 1rem 1.75rem oklch(0.12 0.05 150 / 0.25));
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--accent);
+  font-size: var(--text-overline);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-title);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.035em;
+}
+
+.description {
+  margin: var(--space-3) 0 0;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.form {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.actionButton {
+  flex: 1 1 10rem;
+  min-height: 3rem;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--danger);
+  font-size: var(--text-body-sm);
+  font-weight: 650;
+  border: 1px solid color-mix(in oklch, var(--danger) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklch, var(--danger) 8%, transparent);
+}
+
+.hint {
+  margin: var(--space-4) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+  text-wrap: pretty;
+}
+
+.summary {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.summary div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: baseline;
+}
+
+.summary dt {
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.themeGroup {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.themeGroup legend {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+}
+
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.themeOption {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.themeOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.themeSwatch {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-position: center;
+  background-size: cover;
+  box-shadow: var(--elevation-1);
+}
+
+.themeSwatch img {
+  object-fit: cover;
+}
+
+.themeOption input:checked + .themeSwatch {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.themeOption input:focus-visible + .themeSwatch {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.themeLabel {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  font-weight: 750;
+}
+
+@media (max-width: 35rem) {
+  .panel {
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+
+  .themeOptions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel,
+  .artwork,
+  .progressDot,
+  .themeSwatch,
+  .actionButton,
+  .summary {
+    transition:
+      color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard),
+      transform var(--duration-deliberate) var(--ease-spring),
+      scale var(--duration-fast) var(--ease-spring);
+  }
+
+  .themeOption:hover .themeSwatch {
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-2);
+  }
+
+  .panel {
+    animation: onboarding-panel-enter var(--duration-cinematic)
+      var(--ease-spring) both;
+  }
+
+  .artwork {
+    animation: onboarding-art-enter var(--duration-cinematic)
+      var(--ease-soft-spring) 70ms both;
+  }
+
+  .progressCurrent .progressDot {
+    animation: onboarding-dot-enter var(--duration-deliberate)
+      var(--ease-soft-spring) both;
+  }
+
+  .themeOption input:checked + .themeSwatch {
+    animation: onboarding-theme-select var(--duration-deliberate)
+      var(--ease-soft-spring) both;
+  }
+}
+
+@keyframes onboarding-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.9rem) scale(0.98);
+  }
+}
+
+@keyframes onboarding-art-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg);
+  }
+}
+
+@keyframes onboarding-dot-enter {
+  50% {
+    transform: scale(1.45);
+  }
+}
+
+@keyframes onboarding-theme-select {
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@media (forced-colors: active) {
+  .panel,
+  .summary {
+    border-color: CanvasText;
+  }
+}

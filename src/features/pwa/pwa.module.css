@@ -1,0 +1,135 @@
+.offlineBanner {
+  position: fixed;
+  inset: max(var(--space-3), env(safe-area-inset-top)) var(--space-3) auto;
+  z-index: 80;
+  display: flex;
+  width: fit-content;
+  max-width: calc(100% - 2 * var(--space-3));
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  margin-inline: auto;
+  color: var(--text-primary);
+  border: 1px solid color-mix(in oklch, var(--warning) 48%, var(--border));
+  border-radius: var(--radius-pill);
+  background: var(--warning-subtle);
+  box-shadow: var(--elevation-2);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+}
+
+.updateBanner {
+  position: fixed;
+  right: max(var(--space-3), env(safe-area-inset-right));
+  bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  box-shadow: var(--elevation-3);
+  font-size: var(--text-body-sm);
+}
+
+.updateBanner button {
+  min-height: 2.25rem;
+  padding-inline: var(--space-3);
+  color: var(--accent-contrast);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.offlineBanner svg {
+  flex: 0 0 auto;
+}
+
+.installCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.installIcon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  color: var(--accent);
+  border-radius: var(--radius-lg);
+  background: var(--accent-subtle);
+}
+
+.installCopy h2,
+.installCopy p {
+  margin: 0;
+}
+
+.installCopy h2 {
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+}
+
+.installCopy p {
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.installCopy p svg {
+  display: inline;
+  vertical-align: -0.2em;
+}
+
+.installActions {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 2;
+  gap: var(--space-2);
+}
+.installInstruction {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text-secondary);
+}
+.installInstruction svg {
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+.installAffordance {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 30rem) {
+  .offlineBanner {
+    inset-inline: var(--space-2);
+    max-width: calc(100% - 2 * var(--space-2));
+    border-radius: var(--radius-lg);
+  }
+
+  .installCard {
+    grid-template-columns: 1fr;
+  }
+
+  .installIcon,
+  .installActions {
+    grid-column: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  .offlineBanner,
+  .installIcon {
+    border: 1px solid CanvasText;
+  }
+}

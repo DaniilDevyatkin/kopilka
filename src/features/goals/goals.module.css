@@ -1,0 +1,584 @@
+.page {
+  container-type: inline-size;
+  display: grid;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.heading h1,
+.heading p,
+.card h2,
+.card p,
+.detail h1,
+.detail p,
+.formFooter p,
+.goalActions p {
+  margin: 0;
+}
+.heading p,
+.card p,
+.detail p {
+  color: var(--text-secondary);
+}
+.heading h1,
+.detail h1 {
+  font-size: clamp(1.7rem, 7vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+.newLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  color: var(--accent-contrast);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-weight: 750;
+  text-decoration: none;
+}
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  background: var(--surface-sunken);
+}
+.tab {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-secondary);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0.78rem;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+.tab[data-active="true"] {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+  box-shadow: var(--elevation-1);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.totalPlan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: 1.35rem;
+  background: var(--surface);
+}
+.totalPrimary,
+.totalBreakdown > div {
+  display: grid;
+  gap: var(--space-1);
+}
+.totalPlan span {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+.totalPlan strong {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.totalPrimary strong {
+  font-size: clamp(1.45rem, 6cqi, 2rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+.totalBreakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-inline-start: var(--space-4);
+  border-inline-start: 1px solid var(--border);
+}
+.totalBreakdown strong {
+  font-size: 0.9rem;
+}
+.planWarning {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--warning);
+  border: 1px solid color-mix(in oklch, var(--warning) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--warning-subtle);
+  line-height: 1.5;
+}
+.emergencyGuide {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid color-mix(in oklch, var(--accent) 28%, var(--border));
+  border-radius: var(--radius-xl);
+  background: var(--accent-subtle);
+}
+.emergencyGuide p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+.emergencyOptions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+}
+.feasibility {
+  width: fit-content;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--positive);
+  border-radius: var(--radius-pill);
+  background: var(--positive-subtle);
+  font-size: var(--text-caption);
+  font-weight: 750;
+}
+.feasibility[data-level="strained"] {
+  color: var(--warning);
+  background: var(--warning-subtle);
+}
+.feasibility[data-level="unrealistic"] {
+  color: var(--negative);
+  background: var(--negative-subtle);
+}
+.card {
+  display: grid;
+  min-width: 0;
+  gap: 1.15rem;
+  padding: 1.25rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  text-decoration: none;
+}
+.cardHeader {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+.cardHeader h2 {
+  font-size: 1.05rem;
+  line-height: 1.15;
+}
+.cardHeader p {
+  margin-top: 0.22rem;
+  font-size: var(--text-caption);
+}
+.categoryIcon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  color: var(--accent);
+  border-radius: var(--radius-lg);
+  background: var(--accent-subtle);
+}
+.priority {
+  align-self: start;
+  padding: 0.38rem 0.55rem;
+  color: var(--text-secondary);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  font-size: var(--text-caption);
+  line-height: 1;
+}
+.meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.meta > span {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+.meta small {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+.meta strong {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+.planBlock {
+  display: grid;
+  gap: 0.55rem;
+}
+.planLabel {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.savingPlan {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "month month"
+    "day week";
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background: var(--surface-sunken);
+}
+.savingPlan span {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.75rem;
+}
+.savingPlan span:nth-child(1) {
+  grid-area: day;
+}
+.savingPlan span:nth-child(2) {
+  grid-area: week;
+}
+.savingPlan span:nth-child(3) {
+  grid-area: month;
+  background: var(--surface-elevated);
+  box-shadow: var(--elevation-1);
+}
+.savingPlan small {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+.savingPlan strong {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.savingPlan span:nth-child(3) strong {
+  color: var(--accent);
+  font-size: 1rem;
+}
+.detailPlan {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1.2rem;
+  background: var(--surface-sunken);
+}
+.detailPlan h2,
+.detailPlan p {
+  margin: 0;
+}
+.detailPlan h2 {
+  font-size: 1rem;
+}
+.detailPlan p {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+.empty {
+  padding: var(--space-10);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+.form,
+.detail {
+  display: grid;
+  width: min(100%, 50rem);
+  gap: var(--space-5);
+  padding: clamp(var(--space-5), 5vw, var(--space-8));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.reserveFieldset {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.reserveFieldset legend {
+  padding-inline: var(--space-2);
+  font-weight: 750;
+}
+.reserveFieldset > p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+.formFooter {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.formFooter p,
+.goalActions p {
+  color: var(--negative);
+}
+.detailHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+}
+.detailImage {
+  width: min(12rem, 34vw);
+  height: auto;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+}
+.detailStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.stat {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+}
+.stat span {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+.stat strong {
+  display: block;
+  margin-top: var(--space-2);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.goalActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.editGoalForm {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    border-color: color-mix(in oklch, var(--accent) 34%, var(--border));
+    background: var(--surface-hover);
+    box-shadow: var(--elevation-2);
+    transform: translateY(-0.22rem) scale(1.008);
+  }
+
+  .card:hover .categoryIcon {
+    transform: rotate(-4deg) scale(1.07);
+  }
+
+  .newLink:hover,
+  .tab:hover {
+    transform: translateY(-0.1rem);
+  }
+
+  .imagePreview:hover img,
+  .goalImage:hover img {
+    transform: scale(1.04);
+    filter: saturate(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card,
+  .categoryIcon,
+  .newLink,
+  .tab,
+  .totalPlan,
+  .savingPlan span,
+  .imagePreview,
+  .imagePreview img,
+  .goalImage img,
+  .feasibility {
+    transition:
+      color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard),
+      filter var(--duration-standard) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard),
+      transform var(--duration-deliberate) var(--ease-spring),
+      scale var(--duration-fast) var(--ease-spring);
+  }
+
+  .grid > .card {
+    animation: goals-card-enter var(--duration-reveal) var(--ease-spring) both;
+  }
+
+  .grid > .card:nth-child(2) {
+    animation-delay: 65ms;
+  }
+
+  .grid > .card:nth-child(3) {
+    animation-delay: 115ms;
+  }
+
+  .grid > .card:nth-child(n + 4) {
+    animation-delay: 165ms;
+  }
+
+  .feasibility {
+    animation: goals-status-enter var(--duration-deliberate)
+      var(--ease-soft-spring) 160ms both;
+  }
+}
+
+@keyframes goals-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.98);
+  }
+}
+
+@keyframes goals-status-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+}
+@container (max-width: 42rem) {
+  .grid,
+  .formGrid,
+  .detailStats {
+    grid-template-columns: 1fr;
+  }
+  .detailHero {
+    grid-template-columns: 1fr;
+  }
+  .totalPlan {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .totalBreakdown {
+    padding-block-start: var(--space-4);
+    padding-inline-start: 0;
+    border-block-start: 1px solid var(--border);
+    border-inline-start: 0;
+  }
+  .detailImage {
+    width: 100%;
+    max-height: 15rem;
+  }
+
+  .heading {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .newLink {
+    min-height: 2.625rem;
+    padding-inline: var(--space-4);
+    font-size: 0.8rem;
+  }
+}
+@container (max-width: 24rem) {
+  .newLink {
+    width: 2.75rem;
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+    color: transparent;
+    gap: 0;
+  }
+
+  .newLink svg {
+    color: var(--accent-contrast);
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .priority {
+    max-width: 5.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.imageFieldset {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+}
+
+.imageFieldset legend {
+  margin-block-end: var(--space-2);
+  font-weight: 700;
+}
+
+.imageUpload {
+  display: block;
+  cursor: pointer;
+}
+
+.imageUpload input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.imagePreview {
+  position: relative;
+  display: grid;
+  min-block-size: 9rem;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  color: var(--text-secondary);
+  background: var(--surface-sunken);
+}
+
+.imagePreview img {
+  object-fit: cover;
+}
+
+.goalImage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface-sunken);
+}
+
+.goalImage img {
+  object-fit: cover;
+}

@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Tests and reports
+coverage/
+playwright-report/
+test-results/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# VDS backups are data, not source code
+backups/
+
+# Generated code and local data
+src/generated/
+.data/
+
+# Tooling
+*.tsbuildinfo
+.eslintcache
+.npm-cache/
+.tmp/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

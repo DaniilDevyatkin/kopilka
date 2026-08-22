@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#176f62" />
+    <title>Копилка — без сети</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        background: #f5f4ed;
+        color: #18302c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        min-width: 320px;
+        min-height: 100dvh;
+        margin: 0;
+        padding: max(24px, env(safe-area-inset-top)) 20px
+          max(24px, env(safe-area-inset-bottom));
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 80% 0, #dcece5, transparent 40%), #f5f4ed;
+      }
+      .shell {
+        width: min(100%, 680px);
+        padding: clamp(24px, 7vw, 52px);
+        border: 1px solid #cad8d2;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 24px 70px #193c3320;
+      }
+      .brand {
+        width: 52px;
+        height: 52px;
+      }
+      .label {
+        margin: 28px 0 10px;
+        color: #176f62;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 8vw, 52px);
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+      }
+      p {
+        line-height: 1.55;
+        color: #4d625d;
+      }
+      .summary {
+        display: none;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid #dbe4e0;
+      }
+      .summary[data-ready="true"] {
+        display: block;
+      }
+      .numbers {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+      .metric {
+        padding: 16px;
+        border-radius: 16px;
+        background: #eef5f1;
+      }
+      .metric small {
+        display: block;
+        color: #647873;
+      }
+      .metric strong {
+        display: block;
+        margin-top: 6px;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+      }
+      .lists {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+      li {
+        padding: 10px 0;
+        border-bottom: 1px solid #e4ebe8;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 26px;
+      }
+      button,
+      a {
+        min-height: 44px;
+        padding: 12px 18px;
+        border: 1px solid #176f62;
+        border-radius: 14px;
+        font: inherit;
+        font-weight: 750;
+        cursor: pointer;
+      }
+      button {
+        color: #fff;
+        background: #176f62;
+      }
+      a {
+        color: #176f62;
+        text-decoration: none;
+        background: transparent;
+      }
+      @media (max-width: 520px) {
+        .numbers,
+        .lists {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          background: #101b19;
+          color: #edf6f2;
+        }
+        body {
+          background:
+            radial-gradient(circle at 80% 0, #183b34, transparent 40%), #101b19;
+        }
+        .shell {
+          border-color: #304c46;
+          background: #172622;
+          box-shadow: none;
+        }
+        p,
+        .metric small {
+          color: #acc0ba;
+        }
+        .summary {
+          border-color: #304c46;
+        }
+        .metric {
+          background: #20342f;
+        }
+        li {
+          border-color: #304c46;
+        }
+        a {
+          color: #72c7b6;
+          border-color: #72c7b6;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <img class="brand" src="/logo-mark.svg" alt="" width="52" height="52" />
+      <p class="label">Безопасный offline-режим</p>
+      <h1>Сеть пропала, данные остались под рукой</h1>
+      <p>
+        Копилка показывает последний сохранённый снимок только для чтения.
+        Доходы, расходы, переводы и резервы станут доступны после восстановления
+        соединения.
+      </p>
+      <section class="summary" id="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Последний снимок</h2>
+        <p id="saved-at"></p>
+        <div class="numbers" id="numbers"></div>
+        <div class="lists">
+          <section>
+            <h2>Счета</h2>
+            <ul id="accounts"></ul>
+          </section>
+          <section>
+            <h2>Хотелки</h2>
+            <ul id="goals"></ul>
+          </section>
+        </div>
+      </section>
+      <p id="empty">
+        Снимок ещё не сохранён. Откройте приложение один раз при подключении к
+        сети.
+      </p>
+      <div class="actions">
+        <button type="button" id="retry">Проверить соединение</button
+        ><a href="/login">К экрану входа</a>
+      </div>
+    </main>
+    <script>
+      (() => {
+        const dbName = "kopilka-read-only",
+          store = "snapshots",
+          key = "financial";
+        const money = (value, currency) => {
+          try {
+            const minor = BigInt(value);
+            const negative = minor < 0n;
+            const absolute = negative ? -minor : minor;
+            const major = absolute / 100n;
+            const fraction = String(absolute % 100n).padStart(2, "0");
+            const grouped = new Intl.NumberFormat("ru-RU", {
+              maximumFractionDigits: 0,
+            }).format(major);
+            const symbols = {
+              RUB: "₽",
+              EUR: "€",
+              USD: "$",
+              KZT: "₸",
+              GEL: "₾",
+            };
+            return `${negative ? "−" : ""}${grouped},${fraction}\u00a0${symbols[currency] ?? currency}`;
+          } catch {
+            return `${value} ${currency}`;
+          }
+        };
+        const text = (tag, value) => {
+          const node = document.createElement(tag);
+          node.textContent = value;
+          return node;
+        };
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = () => {
+          if (!request.result.objectStoreNames.contains(store))
+            request.result.createObjectStore(store);
+        };
+        request.onsuccess = () => {
+          const db = request.result;
+          const read = db
+            .transaction(store, "readonly")
+            .objectStore(store)
+            .get(key);
+          read.onsuccess = () => {
+            const data = read.result;
+            db.close();
+            if (!data || data.version !== 1) return;
+            document.querySelector("#empty").hidden = true;
+            const summary = document.querySelector("#summary");
+            summary.dataset.ready = "true";
+            document.querySelector("#saved-at").textContent =
+              `Сохранено ${new Date(data.savedAt).toLocaleString("ru-RU")}`;
+            const metrics = [
+              ["Капитал", data.totalCapitalMinor],
+              ["В резерве", data.reservedMinor],
+              ["Свободно", data.freeMinor],
+            ];
+            const numbers = document.querySelector("#numbers");
+            for (const [label, value] of metrics) {
+              const box = text("div", "");
+              box.className = "metric";
+              box.append(
+                text("small", label),
+                text("strong", money(value, data.currency)),
+              );
+              numbers.append(box);
+            }
+            for (const account of data.accounts.slice(0, 6)) {
+              const item = text("li", account.name);
+              item.append(
+                text(
+                  "strong",
+                  ` — ${money(account.balanceMinor, data.currency)}`,
+                ),
+              );
+              document.querySelector("#accounts").append(item);
+            }
+            for (const goal of data.goals.slice(0, 6)) {
+              const item = text("li", goal.name);
+              item.append(
+                text(
+                  "strong",
+                  ` — ${money(goal.reservedAmountMinor, data.currency)}`,
+                ),
+              );
+              document.querySelector("#goals").append(item);
+            }
+          };
+        };
+        document
+          .querySelector("#retry")
+          .addEventListener("click", () => location.reload());
+      })();
+    </script>
+  </body>
+</html>

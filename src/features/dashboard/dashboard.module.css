@@ -1,0 +1,625 @@
+.page {
+  display: grid;
+  gap: calc(1.5rem + 0.25rem);
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.heading p,
+.heading h1,
+.sectionHeading h2,
+.operation p,
+.operation small {
+  margin: 0;
+}
+
+.heading p {
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+}
+
+.heading h1 {
+  margin-top: 0.15rem;
+  font-size: clamp(1.7rem, 7vw, 2.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+}
+
+.iconAction {
+  display: grid;
+  width: 2.875rem;
+  height: 2.875rem;
+  place-items: center;
+  color: var(--accent-contrast);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0.65rem 1.75rem
+    color-mix(in oklch, var(--accent) 28%, transparent);
+}
+
+.headingActions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.allCardsLink {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  padding-inline: 1rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.balanceHero {
+  position: relative;
+  isolation: isolate;
+  min-height: 12.75rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  color: oklch(0.985 0.006 180);
+  border: 1px solid oklch(0.76 0.14 174 / 0.25);
+  border-radius: 1.8rem;
+  background: linear-gradient(
+    150deg,
+    oklch(0.31 0.1 177),
+    oklch(0.2 0.055 192) 62%,
+    oklch(0.16 0.035 225)
+  );
+  box-shadow: 0 1.6rem 4rem oklch(0.04 0.025 190 / 0.28);
+}
+
+.heroArtwork {
+  z-index: -3;
+  object-fit: cover;
+}
+
+.heroShade {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    oklch(0.12 0.035 190 / 0.92) 0%,
+    oklch(0.12 0.035 190 / 0.74) 52%,
+    oklch(0.12 0.035 190 / 0.32) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 9.65rem;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.balanceHero::before,
+.balanceHero::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  border-radius: 50%;
+}
+
+.balanceHero::before {
+  width: 15rem;
+  height: 15rem;
+  top: -8rem;
+  right: -3rem;
+  background: oklch(0.82 0.17 163 / 0.32);
+}
+
+.balanceHero::after {
+  width: 11rem;
+  height: 11rem;
+  right: 3rem;
+  bottom: -8rem;
+  background: oklch(0.69 0.15 226 / 0.22);
+}
+
+.heroGlow {
+  position: absolute;
+  z-index: -1;
+  width: 8rem;
+  height: 8rem;
+  top: 2rem;
+  right: 1.5rem;
+  border: 1.25rem solid oklch(0.87 0.16 168 / 0.12);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.heroLabel {
+  display: block;
+  color: oklch(0.92 0.025 178 / 0.78);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.heroAmount {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.4rem;
+  overflow-x: auto;
+  font-size: clamp(2.15rem, 11vw, 4.25rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.heroStats {
+  display: flex;
+  gap: 2rem;
+  margin-top: auto;
+}
+
+.heroStats span {
+  display: grid;
+  gap: 0.18rem;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 720;
+}
+
+.heroStats small {
+  color: oklch(0.92 0.025 178 / 0.65);
+  font-size: 0.7rem;
+  font-weight: 550;
+}
+
+.savingsIllustration {
+  position: relative;
+  width: 100%;
+  height: clamp(7.5rem, 31vw, 10rem);
+  margin: -0.35rem 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.savingsIllustration img {
+  object-fit: contain;
+  object-position: center;
+}
+
+.section {
+  display: grid;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.sectionHeading h2 {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.sectionLink {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.45rem 0.65rem;
+  color: var(--text-muted);
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.accountScroller {
+  display: grid;
+  grid-auto-columns: min(84vw, 22rem);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  margin-inline: calc(var(--space-page) * -1);
+  padding: 0 var(--space-page) 0.35rem;
+  overflow-x: auto;
+  scroll-padding-inline: var(--space-page);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.accountScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.account,
+.addCard {
+  min-width: 0;
+  min-height: 11rem;
+  scroll-snap-align: start;
+  border-radius: 1.55rem;
+  text-decoration: none;
+}
+
+.account {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: space-between;
+  padding: 1.25rem;
+  overflow: hidden;
+  color: white;
+  background: linear-gradient(
+    145deg,
+    oklch(0.55 0.16 175),
+    oklch(0.27 0.1 200)
+  );
+  box-shadow: 0 1.2rem 2.8rem oklch(0.05 0.025 190 / 0.24);
+}
+
+.account::after {
+  position: absolute;
+  z-index: -1;
+  width: 12rem;
+  height: 12rem;
+  right: -4rem;
+  bottom: -7rem;
+  content: "";
+  border: 1.7rem solid oklch(0.92 0.12 175 / 0.15);
+  border-radius: 50%;
+}
+
+.account[data-theme="sunset"] {
+  background: linear-gradient(
+    145deg,
+    oklch(0.66 0.18 29),
+    oklch(0.42 0.16 350)
+  );
+}
+
+.account[data-theme="ocean"] {
+  background: linear-gradient(
+    145deg,
+    oklch(0.62 0.17 234),
+    oklch(0.31 0.14 274)
+  );
+}
+
+.account[data-theme="forest"] {
+  background: linear-gradient(
+    145deg,
+    oklch(0.48 0.14 157),
+    oklch(0.24 0.075 176)
+  );
+}
+
+.cardTopline,
+.cardBottomline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: 0.72rem;
+  font-weight: 650;
+  opacity: 0.86;
+}
+
+.cardBalance {
+  align-self: center;
+  font-size: clamp(1.8rem, 8vw, 2.55rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+
+.cardBottomline span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.addCard {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.65rem;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.goalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.goal {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-4);
+  padding: 1.15rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 1.3rem;
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.goalTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.goalTitle span,
+.operationIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--accent);
+  border-radius: 0.9rem;
+  background: var(--accent-subtle);
+}
+
+.goal strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.monthSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.monthSummary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.operationList {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  list-style: none;
+}
+
+.operation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 4.5rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.operation:last-child {
+  border-bottom: 0;
+}
+
+.operation p {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operation small {
+  display: block;
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operationAmount {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.positive {
+  color: var(--positive);
+}
+
+.negative {
+  color: var(--negative);
+}
+
+.empty {
+  display: grid;
+  min-height: 9rem;
+  place-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: var(--space-6);
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.empty strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .quickLinks a:hover > span,
+  .goal:hover,
+  .sectionLink:hover,
+  .addCard:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+    background-color: var(--surface-hover);
+  }
+
+  .account:hover {
+    transform: translateY(-0.22rem) scale(1.012);
+    box-shadow: var(--elevation-2);
+  }
+
+  .balanceHero:hover .heroArtwork {
+    transform: scale(1.035);
+    filter: saturate(1.08) contrast(1.02);
+  }
+
+  .balanceHero:hover .heroGlow {
+    transform: translate3d(-0.4rem, 0.2rem, 0) rotate(-12deg) scale(1.08);
+  }
+
+  .iconAction:hover {
+    transform: translateY(-0.18rem) rotate(4deg);
+    box-shadow: 0 0.9rem 2.25rem
+      color-mix(in oklch, var(--accent) 36%, transparent);
+  }
+
+  .savingsIllustration:hover img {
+    transform: translateY(-0.18rem) scale(1.025) rotate(-0.5deg);
+  }
+}
+
+@media (max-width: 27rem) {
+  .allCardsLink {
+    padding-inline: 0.75rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .accountScroller {
+    grid-auto-columns: min(84vw, 22rem);
+  }
+}
+
+@media (max-width: 36rem) {
+  .goalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 22rem) {
+  .quickLinks a {
+    font-size: 0.65rem;
+  }
+
+  .quickLinks a > span {
+    width: 2.85rem;
+    height: 2.85rem;
+  }
+
+  .heroStats {
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .balanceHero {
+    animation: dashboard-hero-enter var(--duration-cinematic) var(--ease-spring)
+      both;
+  }
+
+  .heroAmount,
+  .heroStats {
+    animation: dashboard-content-enter var(--duration-reveal) var(--ease-spring)
+      120ms both;
+  }
+
+  .heroArtwork,
+  .heroGlow,
+  .savingsIllustration img,
+  .iconAction,
+  .account,
+  .goal,
+  .quickLinks a > span,
+  .sectionLink,
+  .addCard,
+  .operation {
+    transition:
+      transform var(--duration-deliberate) var(--ease-spring),
+      scale var(--duration-fast) var(--ease-spring),
+      filter var(--duration-standard) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard);
+  }
+}
+
+@keyframes dashboard-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.9rem) scale(0.975);
+  }
+}
+
+@keyframes dashboard-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.65rem);
+  }
+}
+
+@media (forced-colors: active) {
+  .balanceHero,
+  .account,
+  .goal,
+  .operationList,
+  .quickLinks a > span {
+    border-color: CanvasText;
+  }
+}
