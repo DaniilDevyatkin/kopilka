@@ -1,5 +1,11 @@
 name: kopilka
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   db:
     image: postgres:18-alpine
@@ -18,6 +24,7 @@ services:
       start_period: 10s
     security_opt:
       - no-new-privileges:true
+    logging: *default-logging
     networks:
       - backend
 
@@ -31,6 +38,7 @@ services:
     restart: "no"
     security_opt:
       - no-new-privileges:true
+    logging: *default-logging
     networks:
       - backend
     profiles:
@@ -68,6 +76,7 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    logging: *default-logging
     networks:
       - backend
       - proxy
@@ -91,6 +100,7 @@ services:
         condition: service_healthy
     security_opt:
       - no-new-privileges:true
+    logging: *default-logging
     networks:
       - proxy
 
