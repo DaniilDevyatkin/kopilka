@@ -1,0 +1,10 @@
+{
+  "name": "kopilka-migrator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "17.2.3",
+    "prisma": "7.9.1"
+  }
+}

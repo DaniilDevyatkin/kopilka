@@ -8,6 +8,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
+FROM base AS migration-dependencies
+WORKDIR /app
+COPY deploy/migrator/package.json deploy/migrator/package-lock.json ./
+RUN npm ci --omit=dev --no-audit --no-fund
+
 FROM base AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -15,7 +20,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 RUN npm run db:generate && npx next build --webpack
 
-FROM dependencies AS migrator
+FROM migration-dependencies AS migrator
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 COPY prisma ./prisma

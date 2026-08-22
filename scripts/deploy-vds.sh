@@ -45,14 +45,21 @@ printf 'Проверяю production-конфигурацию...\n'
 printf 'Обновляю базовые production-образы в пределах зафиксированных major versions...\n'
 "${compose[@]}" pull db caddy
 
-printf 'Собираю образы...\n'
-"${compose[@]}" build --pull app migrate
+printf 'Скачиваю готовые образы последовательно, без сборки на VDS...\n'
+"${compose[@]}" pull app
+"${compose[@]}" pull migrate
 
 printf 'Запускаю PostgreSQL и ожидаю готовности...\n'
 "${compose[@]}" up -d --wait db
 
 printf 'Применяю Prisma migrations...\n'
 "${compose[@]}" run --rm migrate
+
+# Migrator нужен только на время деплоя. На маленьком VDS не храним его постоянно.
+migrate_image="$("${compose[@]}" config --images | grep 'kopilka-migrate' | head -n 1 || true)"
+if [[ -n "$migrate_image" ]]; then
+  docker image rm "$migrate_image" >/dev/null 2>&1 || true
+fi
 
 printf 'Запускаю приложение и HTTPS reverse proxy...\n'
 "${compose[@]}" up -d --wait app caddy
@@ -75,4 +82,5 @@ if command -v curl >/dev/null 2>&1; then
 fi
 
 "${compose[@]}" ps
+docker image prune --force >/dev/null
 printf '\nКопилка доступна: https://%s\n' "$domain"
