@@ -243,7 +243,7 @@
 - [x] Подтвердить stable multi-row locks для goal reserve/completion flows; account, income/expense и transfer strategy уже проверена на PostgreSQL. — `done`, contribute/withdraw/completeGoal используют lock-порядок goal → account (FOR UPDATE) и serialization-conflict retry на PostgreSQL
 - [x] Trusted proxy policy зафиксирована для VDS: только Caddy публикует 80/443, app-порт не опубликован, Caddy формирует forwarding headers, `TRUST_PROXY_HEADERS=true` включён только за этим proxy; subject-based rate limit от заголовков не зависит.
 - [x] Production object storage adapter реализован: `S3StorageAdapter` использует AWS SigV4 и S3-compatible endpoint; при отсутствии обязательных credentials конфигурация fail-closed.
-- [x] Production platform определена: single Linux VDS + Docker Compose, Caddy automatic HTTPS, PostgreSQL/internal network, Next standalone/read-only container и persistent volume для local uploads; HTTPS обеспечивает service worker secure context, второй app replica требует S3-compatible storage.
+- [x] Production platform определена для VDS 8.8 GB: GitHub Actions выпускает checksummed Next standalone, native systemd Node и native Caddy не требуют app images/npm build на VDS, PostgreSQL остаётся единственным Docker container с persistent volume; хранятся максимум две версии и два pre-deploy backup.
 - [ ] Зафиксировать VAPID/Web Push инфраструктуру, если notifications включаются в deployment.
 - [x] Offline snapshot threat model проверен: snapshot read-only, без secret/userId, очищается logout, SW не кэширует private HTML/API; остаточный риск истёкшей server session документирован.
 - [x] Credit-limit UX и запрет резервирования заёмных денег проверены account/operation/goal integration tests и формой лимита.
@@ -252,7 +252,7 @@
 
 | Дата | Изменение | Результат |
 |---|---|---|
-| 2026-08-22 | VDS production deployment | Добавлены hardened multi-stage Docker targets `runner`/`migrator`, production Compose (internal PostgreSQL, persistent volumes, non-root/read-only app), Caddy automatic HTTPS, generated secrets, ordered migrations, health gate, backup script и полный deploy/rollback runbook. Compose config, Bash syntax, lint и strict typecheck проходят; container build требует доступного Docker Engine. |
+| 2026-08-22 | Low-disk VDS production deployment | Устранён пик ENOSPC: GitHub Actions собирает checksummed `.next/standalone`; VDS запускает embedded Node и verified native Caddy через hardened systemd, а Docker хранит только PostgreSQL. Временный Prisma migrator удаляется сразу, uploads переносятся из прежнего volume, приложение переключается атомарно с healthcheck/rollback; сохраняются только две версии и два backup, build cache и старые app images очищаются без удаления database volume. Локальные gates по прямому указанию не перезапускались; production build выполняет удалённый workflow. |
 | 2026-08-09 | Первичный аудит | Репозиторий пуст, AGENTS.md и Git отсутствуют; окружение пригодно для Next/PostgreSQL через Docker |
 | 2026-08-09 | Архитектурный контракт | Зафиксированы server/client boundaries, immutable ledger, virtual reserve, sessions, idempotency и offline read-only |
 | 2026-08-09 | Доменная модель | Зафиксированы сущности, команды, формулы, constraints и read models |

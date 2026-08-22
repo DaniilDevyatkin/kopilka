@@ -516,17 +516,18 @@ docs/
 
 ### 25.1. Production topology для одного VDS
 
-Принята воспроизводимая topology `Caddy → Next.js standalone → PostgreSQL` в Docker Compose:
+Принята экономная topology `native Caddy → native Next.js standalone → PostgreSQL container`:
 
-- снаружи публикуются только TCP 80/443 и UDP 443 у Caddy; порт PostgreSQL и app port не публикуются;
+- GitHub Actions собирает traced `.next/standalone`; на VDS не выполняются `npm ci` и `next build`;
+- снаружи публикуются только TCP 80/443 у native Caddy; app слушает `127.0.0.1:3000`, PostgreSQL — `127.0.0.1:5432`;
 - Caddy автоматически выпускает/обновляет TLS-сертификаты и формирует forwarding headers, поэтому `TRUST_PROXY_HEADERS=true` допустим только в этом production stack;
-- Next.js работает непривилегированным пользователем, с read-only root filesystem, writable `tmpfs`, persistent Next cache и отдельным volume uploads;
-- PostgreSQL находится во внутренней Docker-сети и хранит данные в persistent volume;
-- `prisma migrate deploy` выполняется отдельным одноразовым `migrator` container до запуска новой версии app;
+- Next.js работает systemd-сервисом от непривилегированного пользователя с hardening, отдельными writable cache и uploads;
+- PostgreSQL является единственным Docker-контейнером и хранит данные в persistent volume `kopilka_postgres_data`;
+- `prisma migrate deploy` выполняется временным release-артефактом и migrator удаляется сразу после применения;
 - `/api/health` проверяет не только HTTP-процесс, но и реальное соединение с PostgreSQL;
 - для single-instance VDS local uploads допустимы только вместе с ежедневным backup volume. Перед горизонтальным масштабированием storage переключается на S3-compatible adapter.
 
-Реализация: `compose.production.yml`, `deploy/Caddyfile`, `scripts/deploy-vds.sh`, `scripts/backup-vds.sh`; эксплуатационная инструкция — `docs/vds-deployment.md`.
+На VDS сохраняются только две последние версии и два pre-deploy backup; старые application images/build cache удаляются без затрагивания database volume. Реализация: `.github/workflows/publish-standalone.yml`, `compose.production.yml`, `deploy/*.service`, `scripts/deploy-vds.sh`, `scripts/backup-vds.sh`; эксплуатационная инструкция — `docs/vds-deployment.md`.
 
 ## 26. Риски и принятые меры
 

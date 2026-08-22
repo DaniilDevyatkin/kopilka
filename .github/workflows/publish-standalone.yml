@@ -1,0 +1,100 @@
+name: Publish standalone production release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production-standalone
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  DATABASE_URL: postgresql://kopilka:build-only@127.0.0.1:5432/kopilka?schema=public
+  SESSION_SECRET: build-only-session-secret-with-at-least-sixty-four-characters-2026-kopilka
+  APP_ORIGIN: https://kopim.devyatkinprod.ru
+  DEPLOYMENT_VERSION: ${{ github.sha }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install and generate Prisma Client
+        run: |
+          npm ci --no-audit --no-fund
+          npm run db:generate
+
+      - name: Build compact Next.js standalone server
+        run: npx next build --webpack
+
+      - name: Assemble application artifact
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          stage="$RUNNER_TEMP/kopilka-app"
+          mkdir -p "$stage/.next" "$stage/bin"
+          cp -a .next/standalone/. "$stage/"
+          cp -a .next/static "$stage/.next/static"
+          cp -a public "$stage/public"
+          cp "$(command -v node)" "$stage/bin/node"
+          chmod 0755 "$stage/bin/node"
+          printf '%s\n' "$GITHUB_SHA" > "$stage/VERSION"
+          tar -C "$stage" -czf kopilka-app-linux-x64.tar.gz .
+
+      - name: Assemble temporary migration artifact
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          npm ci --prefix deploy/migrator --omit=dev --no-audit --no-fund
+          stage="$RUNNER_TEMP/kopilka-migrator"
+          mkdir -p "$stage"
+          cp -a deploy/migrator/node_modules "$stage/node_modules"
+          cp -a deploy/migrator/package.json "$stage/package.json"
+          cp -a prisma "$stage/prisma"
+          cp prisma.config.ts "$stage/prisma.config.ts"
+          tar -C "$stage" -czf kopilka-migrator-linux-x64.tar.gz .
+
+      - name: Create checksums
+        shell: bash
+        run: |
+          sha256sum \
+            kopilka-app-linux-x64.tar.gz \
+            kopilka-migrator-linux-x64.tar.gz > SHA256SUMS
+          du -h kopilka-app-linux-x64.tar.gz kopilka-migrator-linux-x64.tar.gz
+
+      - name: Publish stable production assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view production >/dev/null 2>&1; then
+            gh release upload production \
+              kopilka-app-linux-x64.tar.gz \
+              kopilka-migrator-linux-x64.tar.gz \
+              SHA256SUMS \
+              --clobber
+            gh release edit production \
+              --title "Kopilka production artifacts" \
+              --notes "Standalone production build from commit $GITHUB_SHA."
+          else
+            gh release create production \
+              kopilka-app-linux-x64.tar.gz \
+              kopilka-migrator-linux-x64.tar.gz \
+              SHA256SUMS \
+              --target "$GITHUB_SHA" \
+              --title "Kopilka production artifacts" \
+              --notes "Standalone production build from commit $GITHUB_SHA."
+          fi

@@ -1,122 +1,112 @@
-# Развёртывание Копилки на VDS
+# Развёртывание Копилки на малом VDS
 
-Этот сценарий рассчитан на один Linux VDS с публичным доменом. В production-контур входят:
+Production-контур рассчитан на текущий VDS с диском 8.8 GB. На сервере **ничего не собирается** и `npm ci` не запускается:
 
-- `app` — Next.js standalone под непривилегированным пользователем, read-only root filesystem;
-- `db` — PostgreSQL во внутренней Docker-сети без опубликованного порта;
-- `migrate` — одноразовый контейнер `prisma migrate deploy`;
-- `caddy` — единственная публичная точка входа, автоматический HTTPS и HTTP → HTTPS redirect;
-- persistent volumes для PostgreSQL, uploaded images, Next cache и TLS-данных Caddy.
+- GitHub Actions собирает `.next/standalone`, добавляет один Node.js binary и публикует проверяемые SHA-256 артефакты;
+- приложение работает как непривилегированный systemd-сервис `kopilka`;
+- Caddy работает одним native binary и автоматически обслуживает HTTPS;
+- в Docker остаётся только `postgres:18-alpine` с существующим volume `kopilka_postgres_data`;
+- Prisma migrator скачивается только на время deploy и сразу удаляется;
+- хранятся максимум две версии приложения и два локальных pre-deploy backup;
+- Docker build cache, старые app/migrator/Caddy images, `.next` и `node_modules` на VDS удаляются;
+- PostgreSQL ограничен 30 соединениями, 64 MB shared buffers и мягким WAL-пределом 256 MB с WAL compression;
+- database volume никогда автоматически не удаляется.
 
-## 1. Требования
+## 1. Что должно быть готово
 
-- Ubuntu 24.04 LTS или другой актуальный Linux;
-- 2 vCPU, 2–4 GB RAM и 20+ GB SSD для небольшого личного инстанса;
-- домен или поддомен с A-записью на IPv4 VDS; AAAA добавляйте только при рабочем IPv6;
-- открытые TCP-порты `22`, `80`, `443` и UDP-порт `443`;
-- Docker Engine с Compose v2, Git, `curl` и `openssl`.
-
-Установка Docker на Ubuntu выполняется из официального репозитория Docker. После установки проверьте:
-
-```bash
-docker version
-docker compose version
-```
-
-Не публикуйте `5432`: база доступна только контейнерам production stack.
+1. VDS работает на Ubuntu/Debian x86_64 и имеет Docker Engine с Compose v2.
+2. A-запись `kopim.devyatkinprod.ru` указывает на IPv4 VDS. AAAA нужна только при реально настроенном IPv6.
+3. Открыты TCP-порты 22, 80 и 443, при желании UDP 443 для HTTP/3.
+4. В GitHub Actions workflow **Publish standalone production release** завершился зелёным. Он создаёт/обновляет release с тегом `production`.
+5. Перед deploy свободно не менее 650 MB. Текущих 1.9 GB достаточно с большим запасом.
 
 ## 2. Первый запуск
 
-Скопируйте репозиторий на сервер, например в `/opt/kopilka`, и перейдите в каталог:
+На VDS:
 
 ```bash
 cd /opt/kopilka
-bash scripts/deploy-vds.sh kopim.devyatkinprod.ru admin@example.com
+git pull --ff-only origin main
+bash scripts/deploy-vds.sh kopim.devyatkinprod.ru YOUR_EMAIL
 ```
 
-Первый запуск:
+Если репозиторий или release приватный, скрипт сам попросит GitHub token с минимальным правом **Contents: read**. Token вводится скрыто, не попадает в shell history и сохраняется в `/root/.config/kopilka/github-token` с mode `600`. Для публичного release token не нужен.
 
-1. создаёт `.env.production` с mode `600`;
-2. генерирует URL-safe пароль PostgreSQL и 128-символьный `SESSION_SECRET`;
-3. проверяет Compose config;
-4. собирает standalone application image и migration image;
-5. запускает PostgreSQL, применяет migrations, затем запускает app и Caddy;
-6. ожидает успешный `https://DOMAIN/api/health`.
+Первый запуск автоматически:
 
-`.env.production` не входит в Docker build context и игнорируется Git. Сохраните его отдельно в менеджере секретов: потеря `SESSION_SECRET` инвалидирует все существующие сессии.
+1. создаёт `.env.production` с mode `600`, случайными URL-safe паролем PostgreSQL и `SESSION_SECRET`;
+2. сохраняет существующий volume PostgreSQL и переносит старый `kopilka_uploads` в `/var/lib/kopilka/uploads`, если каталог ещё пуст;
+3. запускает только PostgreSQL container;
+4. создаёт сжатый backup перед migration;
+5. скачивает три небольших release assets и проверяет SHA-256;
+6. выполняет `prisma migrate deploy`, затем удаляет мигратор;
+7. атомарно переключает symlink на новый standalone и проверяет `127.0.0.1:3000/api/health`;
+8. переключает HTTPS на native Caddy и проверяет публичный endpoint;
+9. только после успешной проверки удаляет старые Docker app/migrator/Caddy images и build cache; прежние uploads/cache/TLS volumes удаляются только после переноса uploads и успешного HTTPS healthcheck.
 
-Если DNS ещё не обновился, Caddy не сможет получить сертификат. Исправьте DNS/файрвол и повторите ту же команду: существующие данные и секреты сохранятся.
+## 3. Обычное обновление
 
-## 3. Обновление
-
-Перед обновлением сделайте backup, замените исходный код и повторите deploy:
+После зелёного production workflow:
 
 ```bash
 cd /opt/kopilka
-bash scripts/backup-vds.sh
+git pull --ff-only origin main
 bash scripts/deploy-vds.sh
 ```
 
-Скрипт не запускает seed и не пересоздаёт persistent volumes. Prisma применяет только отсутствующие migrations. Не используйте `prisma migrate dev` на сервере.
+Скрипт не запускает seed и не пересоздаёт database volume. При неуспешном локальном healthcheck приложение автоматически возвращается на предыдущий standalone. Уже применённые migration не откатываются удалением схемы: исправления БД выпускаются новой forward migration.
 
-Полезные команды:
+## 4. Диагностика
 
 ```bash
+systemctl status kopilka --no-pager
+systemctl status caddy --no-pager
+journalctl -u kopilka -n 100 --no-pager
+journalctl -u caddy -n 100 --no-pager
 docker compose --env-file .env.production -f compose.production.yml ps
-docker compose --env-file .env.production -f compose.production.yml logs -f --tail=200 app caddy
-docker compose --env-file .env.production -f compose.production.yml restart app
+docker compose --env-file .env.production -f compose.production.yml logs --tail=100 db
+curl --fail http://127.0.0.1:3000/api/health
+curl --fail https://kopim.devyatkinprod.ru/api/health
+df -h /
+docker system df
 ```
 
-## 4. Backup
+## 5. Backup
 
 ```bash
+cd /opt/kopilka
 bash scripts/backup-vds.sh
 ```
 
-Результат появится в `backups/<UTC timestamp>/`:
+Backup содержит:
 
-- `database.dump` — PostgreSQL custom dump;
-- `uploads.tar.gz` — uploaded images;
+- `database.dump` — сжатый PostgreSQL custom dump;
+- `uploads.tar.gz` — пользовательские изображения;
 - `SHA256SUMS` — контроль целостности.
 
-Каталог `backups/` игнорируется Git. Ежедневно копируйте новые backup в зашифрованное внешнее хранилище. Пример cron в 03:20 UTC:
+Локальный backup не заменяет внешнюю копию. После создания перенесите его в зашифрованное внешнее хранилище. Deploy автоматически оставляет локально только два последних pre-deploy backup, чтобы диск не заполнялся.
 
-```cron
-20 3 * * * cd /opt/kopilka && BACKUP_ROOT=/srv/kopilka-backups bash scripts/backup-vds.sh >> /var/log/kopilka-backup.log 2>&1
-```
+## 6. Реальный бюджет диска
 
-## 5. Восстановление
+Основной расход после перехода:
 
-Восстановление изменяет данные, поэтому выполняйте его вручную только в окно обслуживания.
+| Компонент | Хранение |
+|---|---:|
+| PostgreSQL image + служебные слои Docker | обычно сотни MB |
+| Данные PostgreSQL | фактический объём личных данных |
+| Native Caddy | один binary, десятки MB |
+| Два standalone releases с Node.js | обычно несколько сотен MB суммарно |
+| Два сжатых backup | зависит от данных |
+| Migrator | 0 MB между deploy |
+| npm/node_modules/build cache на VDS | 0 MB между deploy |
 
-1. Проверьте checksums: `sha256sum -c SHA256SUMS`.
-2. Остановите приложение и Caddy, оставив БД запущенной.
-3. Сначала восстановите dump в отдельную временную БД и выполните smoke-проверку ledger totals.
-4. Только после проверки переключайте production database или восстанавливайте основной экземпляр.
-5. Разверните uploads в volume `kopilka_uploads` и снова запустите stack.
+Таким образом, прежний пик `npm ci`/`next build` и несколько production Docker images полностью исключены. PostgreSQL сохранён ради транзакций, constraints и финансовой целостности; переход на SQLite не требуется и не решает исходную ENOSPC-проблему сборки.
 
-Не откатывайте уже применённую migration удалением таблиц. Для совместимого rollback верните предыдущий application image; изменение схемы выполняйте новой additive/forward-fix migration.
-
-## 6. Проверка после деплоя
+## 7. Проверка PWA после deploy
 
 ```bash
-curl --fail --show-error https://kopim.devyatkinprod.ru/api/health
 curl -I https://kopim.devyatkinprod.ru/manifest.webmanifest
 curl -I https://kopim.devyatkinprod.ru/sw.js
 ```
 
-Затем вручную проверьте на отдельном тестовом пользователе:
-
-1. регистрацию, вход и logout;
-2. создание карты и изменение баланса операцией;
-3. создание хотелки;
-4. загрузку и последующее чтение изображения;
-5. установку PWA на телефоне и открытие в standalone mode.
-
-## 7. Эксплуатационные правила
-
-- Не редактируйте `.env.production` во время работающего deploy. После смены секрета перезапустите app.
-- При компрометации `SESSION_SECRET` замените его, очистите таблицу sessions и повторно разверните приложение.
-- При росте до нескольких app replicas перенесите uploaded images в S3-compatible storage и задайте общий `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` на build time.
-- Для обновления PostgreSQL между major versions используйте официальный upgrade/backup-restore процесс, а не простую смену image tag.
-- Ежемесячно тестируйте восстановление backup; наличие файла без теста восстановления не подтверждает его пригодность.
+Затем на тестовом пользователе вручную проверьте регистрацию, вход, создание карты, доход/расход, перевод, хотелку, logout и установку PWA с домашнего экрана.

@@ -32,13 +32,13 @@ npm audit --omit=dev
 
 ## Production
 
-Готовый вариант для одного Linux VDS включает PostgreSQL, автоматические Prisma migrations, приложение и Caddy с автоматическим HTTPS:
+Для малого Linux VDS GitHub Actions заранее собирает компактный Next.js standalone. На VDS нет `npm ci` и `next build`: native Node/systemd запускает приложение, native Caddy обслуживает HTTPS, а в Docker остаётся только PostgreSQL.
 
 ```bash
 bash scripts/deploy-vds.sh kopim.devyatkinprod.ru admin@example.com
 ```
 
-Перед первым запуском направьте A/AAAA-запись домена на VDS и откройте TCP 80/443 и UDP 443. Повторный запуск той же команды безопасно пересобирает образ, применяет только новые migrations и обновляет сервисы. Production seed не запускается.
+Перед первым запуском направьте A-запись домена на VDS, откройте TCP 80/443 и дождитесь зелёного workflow `Publish standalone production release`. Повторный запуск скачивает проверенный release, применяет только новые migrations и атомарно переключает приложение. Production seed не запускается.
 
 Полная инструкция, backup и восстановление: [`docs/vds-deployment.md`](docs/vds-deployment.md). Readiness endpoint — `/api/health`.
 
