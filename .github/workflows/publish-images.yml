@@ -1,10 +1,8 @@
 name: Publish production images
 
 on:
-  workflow_run:
-    workflows: [Quality]
+  push:
     branches: [main]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -17,24 +15,9 @@ concurrency:
 
 jobs:
   publish:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Resolve source revision
-        id: revision
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
-            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-          fi
-
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.revision.outputs.sha }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -53,7 +36,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/daniildevyatkin/kopilka:latest
-            ghcr.io/daniildevyatkin/kopilka:${{ steps.revision.outputs.sha }}
+            ghcr.io/daniildevyatkin/kopilka:${{ github.sha }}
           cache-from: type=gha,scope=app
           cache-to: type=gha,mode=max,scope=app
 
@@ -65,6 +48,6 @@ jobs:
           push: true
           tags: |
             ghcr.io/daniildevyatkin/kopilka-migrate:latest
-            ghcr.io/daniildevyatkin/kopilka-migrate:${{ steps.revision.outputs.sha }}
+            ghcr.io/daniildevyatkin/kopilka-migrate:${{ github.sha }}
           cache-from: type=gha,scope=migrate
           cache-to: type=gha,mode=max,scope=migrate
