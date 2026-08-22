@@ -7,7 +7,7 @@
 1. GitHub Actions собирает неизменяемые standalone и временный migrator, публикует SHA-256 checksums.
 2. VDS создаёт backup PostgreSQL и пользовательских изображений.
 3. Дождаться healthcheck PostgreSQL и выполнить `prisma migrate deploy` временным артефактом.
-4. Атомарно переключить standalone, дождаться HTTP 200 от `/api/health`, затем перезапустить native Caddy.
+4. Атомарно переключить standalone, дождаться HTTP 200 от `/api/health`, затем безопасно перезагрузить существующий nginx; native Caddy используется только при отсутствии nginx.
 5. Проверить регистрацию, вход, чтение главной и одну тестовую операцию на отдельном тестовом пользователе.
 
 ## Backup и восстановление

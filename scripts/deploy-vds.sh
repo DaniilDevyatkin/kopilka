@@ -18,6 +18,8 @@ APP_ASSET="kopilka-app-linux-x64.tar.gz"
 MIGRATOR_ASSET="kopilka-migrator-linux-x64.tar.gz"
 CHECKSUM_ASSET="SHA256SUMS"
 CADDY_VERSION="2.11.4"
+NGINX_TEMPLATE="$ROOT_DIR/deploy/nginx-kopilka.conf"
+NGINX_SITE="/etc/nginx/sites-available/kopilka.conf"
 
 fail() {
   printf 'Ошибка: %s\n' "$1" >&2
@@ -144,6 +146,34 @@ install_native_caddy() {
   rm -rf -- "$caddy_temp"
 }
 
+nginx_is_available() {
+  command -v nginx >/dev/null 2>&1 \
+    && systemctl is-active --quiet nginx.service \
+    && command -v certbot >/dev/null 2>&1
+}
+
+configure_nginx_proxy() {
+  printf 'Использую существующий nginx и Certbot; Caddy не требуется.\n'
+  systemctl disable --now caddy.service >/dev/null 2>&1 || true
+
+  install -d -m 0755 /etc/nginx/sites-available /etc/nginx/sites-enabled
+  sed "s/__DOMAIN__/$domain/g" "$NGINX_TEMPLATE" > "$NGINX_SITE"
+  chmod 0644 "$NGINX_SITE"
+  ln -sfn "$NGINX_SITE" /etc/nginx/sites-enabled/kopilka.conf
+
+  nginx -t
+  systemctl reload nginx.service
+  certbot --nginx \
+    --non-interactive \
+    --agree-tos \
+    --keep-until-expiring \
+    --redirect \
+    --email "$email" \
+    --domain "$domain"
+  nginx -t
+  systemctl reload nginx.service
+}
+
 github_headers=()
 load_github_token() {
   local token_file="/root/.config/kopilka/github-token"
@@ -248,19 +278,23 @@ session_secret="$(read_env SESSION_SECRET)"
 [[ "$postgres_password" =~ ^[A-Za-z0-9_-]+$ ]] || fail "POSTGRES_PASSWORD должен быть URL-safe."
 [[ ${#session_secret} -ge 64 ]] || fail "SESSION_SECRET должен содержать не менее 64 символов."
 
-printf 'Устанавливаю маленький native runtime и Caddy (один раз)...\n'
+printf 'Проверяю минимальный runtime для reverse proxy...\n'
 install_runtime_packages
-install_native_caddy
+if ! nginx_is_available; then
+  install_native_caddy
+fi
 
 if ! id kopilka >/dev/null 2>&1; then
   useradd --system --home-dir /var/lib/kopilka --create-home --shell /usr/sbin/nologin kopilka
 fi
-if ! id caddy >/dev/null 2>&1; then
-  useradd --system --home-dir /var/lib/caddy --create-home --shell /usr/sbin/nologin caddy
-fi
 install -d -m 0755 "$RUNTIME_ROOT" "$RELEASES_DIR"
 install -d -o kopilka -g kopilka -m 0700 "$UPLOADS_DIR" "$CACHE_DIR"
-install -d -o caddy -g caddy -m 0700 /var/lib/caddy
+if ! nginx_is_available; then
+  if ! id caddy >/dev/null 2>&1; then
+    useradd --system --home-dir /var/lib/caddy --create-home --shell /usr/sbin/nologin caddy
+  fi
+  install -d -o caddy -g caddy -m 0700 /var/lib/caddy
+fi
 install -d -m 0700 "$SYSTEM_ENV_DIR" "$BACKUP_ROOT"
 
 compose=(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE")
@@ -391,19 +425,25 @@ if [[ "$healthy" != true ]]; then
   fail "Новый standalone не прошёл локальный healthcheck; выполнен откат приложения."
 fi
 
-printf 'Переключаю HTTPS на native Caddy...\n'
 remove_old_compose_service caddy
-install -d -o root -g caddy -m 0750 /etc/caddy
-sed \
-  -e "s/__DOMAIN__/$domain/g" \
-  -e "s/__ACME_EMAIL__/$email/g" \
-  "$ROOT_DIR/deploy/Caddyfile" > /etc/caddy/Caddyfile
-caddy fmt --overwrite /etc/caddy/Caddyfile
-caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-install -m 0644 "$ROOT_DIR/deploy/caddy.service" /etc/systemd/system/caddy.service
-systemctl daemon-reload
-systemctl enable caddy.service >/dev/null
-systemctl restart caddy.service
+if nginx_is_available; then
+  configure_nginx_proxy
+else
+  printf 'Переключаю HTTPS на native Caddy...\n'
+  install -d -o root -g caddy -m 0750 /etc/caddy
+  sed \
+    -e "s/__DOMAIN__/$domain/g" \
+    -e "s/__ACME_EMAIL__/$email/g" \
+    "$ROOT_DIR/deploy/Caddyfile" > /etc/caddy/Caddyfile
+  chown root:caddy /etc/caddy/Caddyfile
+  chmod 0640 /etc/caddy/Caddyfile
+  caddy fmt --overwrite /etc/caddy/Caddyfile
+  caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+  install -m 0644 "$ROOT_DIR/deploy/caddy.service" /etc/systemd/system/caddy.service
+  systemctl daemon-reload
+  systemctl enable caddy.service >/dev/null
+  systemctl restart caddy.service
+fi
 
 public_healthy=false
 for _ in {1..24}; do
@@ -413,7 +453,12 @@ for _ in {1..24}; do
   fi
   sleep 5
 done
-[[ "$public_healthy" == true ]] || fail "HTTPS healthcheck не прошёл. Проверьте DNS, firewall и: journalctl -u caddy -n 100"
+if [[ "$public_healthy" != true ]]; then
+  if nginx_is_available; then
+    fail "HTTPS healthcheck не прошёл. Проверьте DNS, firewall и: journalctl -u nginx -n 100"
+  fi
+  fail "HTTPS healthcheck не прошёл. Проверьте DNS, firewall и: journalctl -u caddy -n 100"
+fi
 
 printf 'Удаляю старые application-контейнеры и их тяжёлые образы...\n'
 remove_old_compose_service app
@@ -430,6 +475,11 @@ done < <(docker image ls --format '{{.Repository}} {{.ID}}' \
   | sort -u)
 docker image rm caddy:2-alpine >/dev/null 2>&1 || true
 docker image prune --force >/dev/null 2>&1 || true
+
+if nginx_is_available; then
+  rm -f -- /usr/local/bin/caddy /etc/systemd/system/caddy.service
+  systemctl daemon-reload
+fi
 
 for generated_dir in "$ROOT_DIR/node_modules" "$ROOT_DIR/.next"; do
   [[ "$generated_dir" == "$ROOT_DIR/"* ]] || fail "Отказ очистки неожиданного пути: $generated_dir"

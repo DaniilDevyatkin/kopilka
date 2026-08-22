@@ -516,11 +516,11 @@ docs/
 
 ### 25.1. Production topology для одного VDS
 
-Принята экономная topology `native Caddy → native Next.js standalone → PostgreSQL container`:
+Принята экономная topology `существующий nginx → native Next.js standalone → PostgreSQL container` (native Caddy остаётся fallback для чистого VDS без nginx):
 
 - GitHub Actions собирает traced `.next/standalone`; на VDS не выполняются `npm ci` и `next build`;
-- снаружи публикуются только TCP 80/443 у native Caddy; app слушает `127.0.0.1:3000`, PostgreSQL — `127.0.0.1:5432`;
-- Caddy автоматически выпускает/обновляет TLS-сертификаты и формирует forwarding headers, поэтому `TRUST_PROXY_HEADERS=true` допустим только в этом production stack;
+- снаружи публикуются только TCP 80/443 у nginx; app слушает `127.0.0.1:3000`, PostgreSQL — `127.0.0.1:5432`;
+- Certbot выпускает/обновляет TLS-сертификаты, а nginx формирует forwarding headers, поэтому `TRUST_PROXY_HEADERS=true` допустим только в этом production stack;
 - Next.js работает systemd-сервисом от непривилегированного пользователя с hardening, отдельными writable cache и uploads;
 - PostgreSQL является единственным Docker-контейнером и хранит данные в persistent volume `kopilka_postgres_data`;
 - `prisma migrate deploy` выполняется временным release-артефактом и migrator удаляется сразу после применения;

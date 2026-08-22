@@ -4,7 +4,7 @@ Production-контур рассчитан на текущий VDS с диско
 
 - GitHub Actions собирает `.next/standalone`, добавляет один Node.js binary и публикует проверяемые SHA-256 артефакты;
 - приложение работает как непривилегированный systemd-сервис `kopilka`;
-- Caddy работает одним native binary и автоматически обслуживает HTTPS;
+- существующий nginx обслуживает HTTPS через Certbot; native Caddy используется только как fallback на чистом VDS;
 - в Docker остаётся только `postgres:18-alpine` с существующим volume `kopilka_postgres_data`;
 - Prisma migrator скачивается только на время deploy и сразу удаляется;
 - хранятся максимум две версии приложения и два локальных pre-deploy backup;
@@ -41,7 +41,7 @@ bash scripts/deploy-vds.sh kopim.devyatkinprod.ru YOUR_EMAIL
 5. скачивает три небольших release assets и проверяет SHA-256;
 6. выполняет `prisma migrate deploy`, затем удаляет мигратор;
 7. атомарно переключает symlink на новый standalone и проверяет `127.0.0.1:3000/api/health`;
-8. переключает HTTPS на native Caddy и проверяет публичный endpoint;
+8. подключает отдельный virtual host к существующему nginx, получает TLS через Certbot и проверяет публичный endpoint (Caddy — fallback без nginx);
 9. только после успешной проверки удаляет старые Docker app/migrator/Caddy images и build cache; прежние uploads/cache/TLS volumes удаляются только после переноса uploads и успешного HTTPS healthcheck.
 
 ## 3. Обычное обновление
@@ -60,9 +60,9 @@ bash scripts/deploy-vds.sh
 
 ```bash
 systemctl status kopilka --no-pager
-systemctl status caddy --no-pager
+systemctl status nginx --no-pager
 journalctl -u kopilka -n 100 --no-pager
-journalctl -u caddy -n 100 --no-pager
+journalctl -u nginx -n 100 --no-pager
 docker compose --env-file .env.production -f compose.production.yml ps
 docker compose --env-file .env.production -f compose.production.yml logs --tail=100 db
 curl --fail http://127.0.0.1:3000/api/health
@@ -94,7 +94,7 @@ Backup содержит:
 |---|---:|
 | PostgreSQL image + служебные слои Docker | обычно сотни MB |
 | Данные PostgreSQL | фактический объём личных данных |
-| Native Caddy | один binary, десятки MB |
+| nginx | уже установлен на VDS; отдельный контейнер или proxy binary не требуется |
 | Два standalone releases с Node.js | обычно несколько сотен MB суммарно |
 | Два сжатых backup | зависит от данных |
 | Migrator | 0 MB между deploy |
