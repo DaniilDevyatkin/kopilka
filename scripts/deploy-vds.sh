@@ -19,6 +19,7 @@ MIGRATOR_ASSET="kopilka-migrator-linux-x64.tar.gz"
 CHECKSUM_ASSET="SHA256SUMS"
 CADDY_VERSION="2.11.4"
 NGINX_TEMPLATE="$ROOT_DIR/deploy/nginx-kopilka.conf"
+NGINX_TLS_TEMPLATE="$ROOT_DIR/deploy/nginx-kopilka-tls.conf"
 NGINX_SITE="/etc/nginx/sites-available/kopilka.conf"
 
 fail() {
@@ -153,23 +154,43 @@ nginx_is_available() {
 }
 
 configure_nginx_proxy() {
+  local certificate_dir="/etc/letsencrypt/live/$domain"
+  local renewal_hook="/etc/letsencrypt/renewal-hooks/deploy/reload-kopilka-nginx"
+
   printf 'Использую существующий nginx и Certbot; Caddy не требуется.\n'
   systemctl disable --now caddy.service >/dev/null 2>&1 || true
 
   install -d -m 0755 /etc/nginx/sites-available /etc/nginx/sites-enabled
-  sed "s/__DOMAIN__/$domain/g" "$NGINX_TEMPLATE" > "$NGINX_SITE"
+  install -d -m 0755 /var/www/letsencrypt/.well-known/acme-challenge
+
+  if [[ -s "$certificate_dir/fullchain.pem" && -s "$certificate_dir/privkey.pem" ]]; then
+    sed "s/__DOMAIN__/$domain/g" "$NGINX_TLS_TEMPLATE" > "$NGINX_SITE"
+  else
+    sed "s/__DOMAIN__/$domain/g" "$NGINX_TEMPLATE" > "$NGINX_SITE"
+  fi
   chmod 0644 "$NGINX_SITE"
   ln -sfn "$NGINX_SITE" /etc/nginx/sites-enabled/kopilka.conf
 
   nginx -t
   systemctl reload nginx.service
-  certbot --nginx \
+  certbot certonly \
+    --webroot \
+    --webroot-path /var/www/letsencrypt \
     --non-interactive \
     --agree-tos \
     --keep-until-expiring \
-    --redirect \
     --email "$email" \
     --domain "$domain"
+
+  [[ -s "$certificate_dir/fullchain.pem" && -s "$certificate_dir/privkey.pem" ]] \
+    || fail "Certbot не создал сертификат для $domain."
+  sed "s/__DOMAIN__/$domain/g" "$NGINX_TLS_TEMPLATE" > "$NGINX_SITE"
+  chmod 0644 "$NGINX_SITE"
+
+  install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
+  printf '%s\n' '#!/usr/bin/env sh' 'systemctl reload nginx.service' > "$renewal_hook"
+  chmod 0755 "$renewal_hook"
+
   nginx -t
   systemctl reload nginx.service
 }
