@@ -2,10 +2,7 @@ import "server-only";
 
 import { createHmac, randomBytes } from "node:crypto";
 
-import {
-  isSessionToken,
-  SESSION_COOKIE_NAME,
-} from "@/lib/auth/session-token";
+import { isSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session-token";
 
 export { isSessionToken, SESSION_COOKIE_NAME };
 

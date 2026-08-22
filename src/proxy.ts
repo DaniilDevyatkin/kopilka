@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import {
-  isSessionToken,
-  SESSION_COOKIE_NAME,
-} from "@/lib/auth/session-token";
+import { isSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session-token";
 
 /**
  * Cheap optimistic gate. Secure authorization remains in the server-only
