@@ -68,6 +68,9 @@ install_runtime_packages() {
   local -a missing=()
   local package
   local deadline
+  local next_notice
+  local blocker_pids
+  local waiting_for_apt=false
 
   for package in "${packages[@]}"; do
     if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null \
@@ -82,16 +85,29 @@ install_runtime_packages() {
   fi
 
   deadline=$((SECONDS + 600))
+  next_notice=$((SECONDS + 60))
   while pgrep -x apt >/dev/null 2>&1 \
     || pgrep -x apt-get >/dev/null 2>&1 \
     || pgrep -x dpkg >/dev/null 2>&1 \
     || pgrep -f '^/usr/bin/unattended-upgrade' >/dev/null 2>&1 \
     || pgrep -f '^/usr/lib/apt/apt.systemd.daily' >/dev/null 2>&1; do
+    if [[ "$waiting_for_apt" == false ]]; then
+      printf 'apt/dpkg занят системным обновлением; спокойно жду освобождения блокировки (до 10 минут)...\n'
+      waiting_for_apt=true
+    fi
     (( SECONDS < deadline )) \
       || fail "apt/dpkg занят дольше 10 минут. Не удаляйте lock-файлы; проверьте: ps aux | grep -E '[a]pt|[d]pkg'"
-    printf 'apt/dpkg занят системным обновлением; жду освобождения блокировки...\n'
+    if (( SECONDS >= next_notice )); then
+      blocker_pids="$({ pgrep -x apt; pgrep -x apt-get; pgrep -x dpkg; } 2>/dev/null \
+        | sort -u | paste -sd, -)"
+      printf 'Всё ещё жду apt/dpkg%s...\n' "${blocker_pids:+ (PID: $blocker_pids)}"
+      next_notice=$((SECONDS + 60))
+    fi
     sleep 5
   done
+  if [[ "$waiting_for_apt" == true ]]; then
+    printf 'Блокировка apt/dpkg освобождена; продолжаю deploy.\n'
+  fi
 
   export DEBIAN_FRONTEND=noninteractive
   apt-get -o DPkg::Lock::Timeout=600 update
