@@ -64,10 +64,39 @@ create_environment() {
 }
 
 install_runtime_packages() {
+  local -a packages=(ca-certificates curl jq openssl tar)
+  local -a missing=()
+  local package
+  local deadline
+
+  for package in "${packages[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null \
+      | grep -q '^install ok installed$'; then
+      missing+=("$package")
+    fi
+  done
+
+  if (( ${#missing[@]} == 0 )); then
+    printf 'Системные runtime-пакеты уже установлены; apt не запускаю.\n'
+    return
+  fi
+
+  deadline=$((SECONDS + 600))
+  while pgrep -x apt >/dev/null 2>&1 \
+    || pgrep -x apt-get >/dev/null 2>&1 \
+    || pgrep -x dpkg >/dev/null 2>&1 \
+    || pgrep -f '^/usr/bin/unattended-upgrade' >/dev/null 2>&1 \
+    || pgrep -f '^/usr/lib/apt/apt.systemd.daily' >/dev/null 2>&1; do
+    (( SECONDS < deadline )) \
+      || fail "apt/dpkg занят дольше 10 минут. Не удаляйте lock-файлы; проверьте: ps aux | grep -E '[a]pt|[d]pkg'"
+    printf 'apt/dpkg занят системным обновлением; жду освобождения блокировки...\n'
+    sleep 5
+  done
+
   export DEBIAN_FRONTEND=noninteractive
-  apt-get update
-  apt-get install -y --no-install-recommends \
-    ca-certificates curl jq openssl tar
+  apt-get -o DPkg::Lock::Timeout=600 update
+  apt-get -o DPkg::Lock::Timeout=600 install -y --no-install-recommends \
+    "${missing[@]}"
 
   apt-get clean
   rm -rf -- /var/lib/apt/lists/*
