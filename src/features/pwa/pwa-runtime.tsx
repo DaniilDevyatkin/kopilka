@@ -60,6 +60,7 @@ export function PwaRuntime({ children }: { children: React.ReactNode }) {
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const refreshingRef = useRef(false);
   const updateRequestedRef = useRef(false);
+  const controlledAtMountRef = useRef(false);
 
   useEffect(() => {
     const initialize = window.setTimeout(() => {
@@ -93,12 +94,20 @@ export function PwaRuntime({ children }: { children: React.ReactNode }) {
 
     let removeWorkerListeners = () => undefined;
     const onControllerChange = () => {
-      if (!updateRequestedRef.current || refreshingRef.current) return;
+      if (
+        (!controlledAtMountRef.current && !updateRequestedRef.current) ||
+        refreshingRef.current
+      ) {
+        return;
+      }
       refreshingRef.current = true;
       window.location.reload();
     };
 
     if ("serviceWorker" in navigator && window.isSecureContext) {
+      controlledAtMountRef.current = Boolean(
+        navigator.serviceWorker.controller,
+      );
       navigator.serviceWorker.addEventListener(
         "controllerchange",
         onControllerChange,

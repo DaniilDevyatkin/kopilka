@@ -2,9 +2,14 @@ import "server-only";
 
 import { createHmac, randomBytes } from "node:crypto";
 
-export const SESSION_COOKIE_NAME = "kopilka_session";
+import {
+  isSessionToken,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth/session-token";
+
+export { isSessionToken, SESSION_COOKIE_NAME };
+
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-const SESSION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/u;
 
 export interface SessionGrant {
   rawToken: string;
@@ -22,10 +27,6 @@ export interface SessionCookieOptions {
 
 export function createSessionToken(): string {
   return randomBytes(32).toString("base64url");
-}
-
-export function isSessionToken(value: string): boolean {
-  return SESSION_TOKEN_PATTERN.test(value);
 }
 
 export function hashSessionToken(

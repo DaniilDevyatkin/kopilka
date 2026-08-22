@@ -1,5 +1,5 @@
-const SHELL_CACHE = "kopilka-shell-v5";
-const STATIC_CACHE = "kopilka-static-v5";
+const SHELL_CACHE = "kopilka-shell-v6";
+const MEDIA_CACHE = "kopilka-media-v6";
 const OFFLINE_URL = "/offline.html";
 const SHELL_ASSETS = [
   OFFLINE_URL,
@@ -11,7 +11,10 @@ const SHELL_ASSETS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)),
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(SHELL_ASSETS))
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -22,7 +25,11 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => ![SHELL_CACHE, STATIC_CACHE].includes(key))
+            .filter(
+              (key) =>
+                key.startsWith("kopilka-") &&
+                ![SHELL_CACHE, MEDIA_CACHE].includes(key),
+            )
             .map((key) => caches.delete(key)),
         ),
       )
@@ -56,7 +63,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (!["font", "image", "script", "style"].includes(request.destination)) {
+  // Versioned Next.js scripts and styles intentionally stay under the
+  // browser's normal HTTP cache. Serving an old chunk after a deployment can
+  // make an installed PWA fail before React is able to recover.
+  if (!["font", "image"].includes(request.destination)) {
     return;
   }
 
@@ -66,18 +76,11 @@ self.addEventListener("fetch", (event) => {
         if (response.ok && response.type === "basic") {
           const copy = response.clone();
           event.waitUntil(
-            caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy)),
+            caches.open(MEDIA_CACHE).then((cache) => cache.put(request, copy)),
           );
         }
         return response;
       });
-      if (request.destination === "script" || request.destination === "style") {
-        try {
-          return await network;
-        } catch {
-          return cached || Response.error();
-        }
-      }
       return cached || network;
     }),
   );

@@ -85,9 +85,11 @@ describe("PWA foundation", () => {
     expect(source).toContain('request.mode === "navigate"');
     expect(source).toContain("CLEAR_PRIVATE_DATA");
     expect(source).toContain("SKIP_WAITING");
+    expect(source).toContain("self.skipWaiting()");
     expect(source).toContain("navigationPreload");
-    expect(source).toContain('request.destination === "script"');
-    expect(source).toContain("return await network");
+    expect(source).toContain('["font", "image"]');
+    expect(source).not.toContain('request.destination === "script"');
+    expect(source).not.toContain('request.destination === "style"');
     expect(source).not.toMatch(
       /backgroundsync|sync\.register|mutation[-_ ]queue/iu,
     );

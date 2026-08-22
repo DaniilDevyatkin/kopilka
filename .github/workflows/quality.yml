@@ -40,6 +40,34 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Smoke-test production route guards
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          npm run start > "$RUNNER_TEMP/kopilka-production.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:3000/api/health >/dev/null; then
+              break
+            fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              cat "$RUNNER_TEMP/kopilka-production.log"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          headers="$RUNNER_TEMP/private-route-headers"
+          status=$(curl --silent --output /dev/null --dump-header "$headers" \
+            --write-out '%{http_code}' http://127.0.0.1:3000/app/home)
+          if [[ "$status" != "307" ]] || ! grep -Eiq '^location: /login\r?$' "$headers"; then
+            echo "Expected anonymous /app/home to redirect to /login; got HTTP $status"
+            cat "$headers"
+            cat "$RUNNER_TEMP/kopilka-production.log"
+            exit 1
+          fi
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: npm audit --omit=dev
