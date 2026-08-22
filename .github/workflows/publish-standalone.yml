@@ -91,7 +91,7 @@ jobs:
           headers="$RUNNER_TEMP/standalone-private-route-headers"
           status=$(curl --silent --output /dev/null --dump-header "$headers" \
             --write-out '%{http_code}' http://127.0.0.1:3100/app/home)
-          if [[ "$status" != "307" ]] || ! grep -Eiq '^location: /login\r?$' "$headers"; then
+          if [[ "$status" != "307" ]] || ! grep -Eiq '^location: (https?://[^/]+)?/login\r?$' "$headers"; then
             echo "Expected standalone /app/home to redirect to /login; got HTTP $status"
             cat "$headers"
             cat "$RUNNER_TEMP/kopilka-standalone.log"
