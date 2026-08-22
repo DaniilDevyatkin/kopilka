@@ -138,7 +138,7 @@ install_native_caddy() {
     > "$caddy_temp/$archive"
   checksum_line="$(grep "  $archive\$" "$caddy_temp/checksums.txt" | head -n 1)"
   [[ -n "$checksum_line" ]] || fail "Не найден checksum Caddy $CADDY_VERSION."
-  (cd "$caddy_temp" && printf '%s\n' "$checksum_line" | sha256sum --check -)
+  (cd "$caddy_temp" && printf '%s\n' "$checksum_line" | sha512sum --check -)
   tar -xzf "$caddy_temp/$archive" -C "$caddy_temp" caddy
   install -m 0755 "$caddy_temp/caddy" /usr/local/bin/caddy
   rm -rf -- "$caddy_temp"
