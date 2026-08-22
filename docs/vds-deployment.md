@@ -31,7 +31,7 @@ docker compose version
 
 ```bash
 cd /opt/kopilka
-bash scripts/deploy-vds.sh kopilka.example.com admin@example.com
+bash scripts/deploy-vds.sh kopim.devyatkinprod.ru admin@example.com
 ```
 
 Первый запуск:
@@ -100,9 +100,9 @@ bash scripts/backup-vds.sh
 ## 6. Проверка после деплоя
 
 ```bash
-curl --fail --show-error https://kopilka.example.com/api/health
-curl -I https://kopilka.example.com/manifest.webmanifest
-curl -I https://kopilka.example.com/sw.js
+curl --fail --show-error https://kopim.devyatkinprod.ru/api/health
+curl -I https://kopim.devyatkinprod.ru/manifest.webmanifest
+curl -I https://kopim.devyatkinprod.ru/sw.js
 ```
 
 Затем вручную проверьте на отдельном тестовом пользователе:

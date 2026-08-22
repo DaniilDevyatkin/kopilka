@@ -35,7 +35,7 @@ npm audit --omit=dev
 Готовый вариант для одного Linux VDS включает PostgreSQL, автоматические Prisma migrations, приложение и Caddy с автоматическим HTTPS:
 
 ```bash
-bash scripts/deploy-vds.sh kopilka.example.com admin@example.com
+bash scripts/deploy-vds.sh kopim.devyatkinprod.ru admin@example.com
 ```
 
 Перед первым запуском направьте A/AAAA-запись домена на VDS и откройте TCP 80/443 и UDP 443. Повторный запуск той же команды безопасно пересобирает образ, применяет только новые migrations и обновляет сервисы. Production seed не запускается.
